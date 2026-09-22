@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Twenty-One — The Velvet Table</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green-dark:#0a2a20;
+    --green:#0e3b2c;
+    --green-light:#154a37;
+    --gold:#c9a227;
+    --gold-bright:#e8c85a;
+    --yellow:#f2c94c;
+    --white:#f5f3ec;
+    --white-pure:#ffffff;
+    --black:#0d0d0d;
+    --red:#a63d40;
+    --red-bright:#d3595c;
+    --grey:#8b948e;
+    --grey-dark:#3a423d;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 50% 0%, var(--green-light) 0%, var(--green) 45%, var(--green-dark) 100%);
+    color:var(--white);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+  }
+
+  h1, h2, .display{ font-family:'Fraunces', serif; }
+  a{ color:inherit; text-decoration:none; }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    position:sticky;
+    top:0;
+    z-index:50;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:14px 28px;
+    background:rgba(13,13,13,0.85);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid rgba(201,162,39,0.3);
+  }
+
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:'Fraunces', serif;
+    font-size:20px;
+    font-weight:600;
+    color:var(--white-pure);
+  }
+  .brand .mark{
+    width:30px; height:30px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--gold-bright), var(--gold) 60%, #7a5f14 100%);
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px;
+    color:var(--black);
+  }
+
+  .back-link{
+    font-size:13px;
+    color:var(--grey);
+    border:1px solid var(--grey-dark);
+    padding:7px 14px;
+    border-radius:999px;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .back-link:hover{ border-color:var(--gold); color:var(--white-pure); }
+
+  .balance-chip{
+    background:rgba(255,255,255,0.06);
+    border:1px solid var(--grey-dark);
+    border-radius:999px;
+    padding:7px 16px;
+    font-size:13.5px;
+    color:var(--yellow);
+    font-weight:600;
+  }
+  .balance-chip span.label{ color:var(--grey); font-weight:500; margin-right:6px; }
+
+  .topbar-right{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+
+  /* ---------- Game area ---------- */
+  main{
+    max-width:560px;
+    margin:0 auto;
+    padding:48px 24px 70px;
+  }
+
+  .table-card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.15));
+    border:1px solid rgba(201,162,39,0.3);
+    border-radius:10px;
+    padding:30px;
+  }
+
+  .table-card h2{
+    margin:0 0 4px;
+    font-size:28px;
+    color:var(--gold-bright);
+  }
+  .table-card .sub{
+    margin:0 0 26px;
+    font-size:13.5px;
+    color:var(--grey);
+  }
+
+  .bj-zone{ margin-bottom:20px; }
+  .bj-zone .zone-label{
+    font-size:12.5px;
+    color:var(--grey);
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:8px;
+  }
+  .card-row{
+    display:flex;
+    gap:8px;
+    min-height:82px;
+    flex-wrap:wrap;
+  }
+  .card{
+    width:56px;
+    height:78px;
+    background:var(--white-pure);
+    color:var(--black);
+    border-radius:6px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:21px;
+    box-shadow:0 3px 6px rgba(0,0,0,0.35);
+  }
+  .card.red{ color:var(--red); }
+  .card.back{
+    background:repeating-linear-gradient(45deg, var(--green-light), var(--green-light) 4px, var(--gold) 4px, var(--gold) 8px);
+  }
+
+  .result-msg{
+    min-height:26px;
+    text-align:center;
+    font-size:15px;
+    font-weight:600;
+    margin-bottom:10px;
+  }
+  .result-msg.win{ color:#8fd19e; }
+  .result-msg.lose{ color:var(--red-bright); }
+  .result-msg.neutral{ color:var(--grey); }
+
+  .bet-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  .bet-row label{
+    font-size:13px;
+    color:var(--grey);
+    margin-right:2px;
+  }
+  .bet-row input[type=number]{
+    width:90px;
+    background:rgba(0,0,0,0.3);
+    border:1px solid rgba(201,162,39,0.4);
+    color:var(--white);
+    padding:8px 10px;
+    border-radius:6px;
+    font-family:'Inter', sans-serif;
+    font-size:15px;
+  }
+  .chip-btn{
+    background:rgba(201,162,39,0.15);
+    border:1px solid var(--gold);
+    color:var(--gold-bright);
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:12.5px;
+    cursor:pointer;
+    transition:background .15s ease;
+  }
+  .chip-btn:hover{ background:rgba(201,162,39,0.3); }
+
+  .bj-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+
+  .primary-btn{
+    flex:1;
+    background:var(--gold);
+    color:var(--black);
+    border:none;
+    padding:13px 22px;
+    border-radius:6px;
+    font-family:'Inter', sans-serif;
+    font-weight:600;
+    font-size:15px;
+    cursor:pointer;
+    transition:background .15s ease, transform .1s ease;
+  }
+  .primary-btn:hover:not(:disabled){ background:var(--gold-bright); }
+  .primary-btn:disabled{ opacity:0.4; cursor:not-allowed; }
+  .primary-btn:active:not(:disabled){ transform:scale(0.98); }
+
+  .secondary-btn{
+    flex:1;
+    background:transparent;
+    border:1px solid var(--grey);
+    color:var(--white);
+    padding:13px 18px;
+    border-radius:6px;
+    font-size:14.5px;
+    cursor:pointer;
+  }
+  .secondary-btn:hover:not(:disabled){ color:var(--white-pure); border-color:var(--white-pure); }
+  .secondary-btn:disabled{ opacity:0.35; cursor:not-allowed; }
+
+  footer{
+    text-align:center;
+    padding:20px;
+    font-size:12px;
+    color:rgba(245,243,236,0.4);
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <span class="mark">♠</span>
+    The Velvet Table
+  </div>
+  <div class="topbar-right">
+    <div class="balance-chip"><span class="label">Chips</span><span id="balance-display">1,000</span></div>
+    <a class="back-link" href="home.html">← Lobby</a>
+  </div>
+</div>
+
+<main>
+  <section class="table-card">
+    <h2>Twenty-One</h2>
+    <p class="sub">Beat the dealer without going over 21. Dealer stands on 17.</p>
+
+    <div class="bj-zone">
+      <div class="zone-label"><span>Dealer</span><span id="dealer-total"></span></div>
+      <div class="card-row" id="dealer-cards"></div>
+    </div>
+
+    <div class="bj-zone">
+      <div class="zone-label"><span>You</span><span id="player-total"></span></div>
+      <div class="card-row" id="player-cards"></div>
+    </div>
+
+    <div class="result-msg neutral" id="bj-msg">Place a bet to deal in.</div>
+
+    <div class="bet-row">
+      <label for="bj-bet">Bet</label>
+      <input type="number" id="bj-bet" value="10" min="1" step="1">
+      <button class="chip-btn" data-amt="10">+10</button>
+      <button class="chip-btn" data-amt="50">+50</button>
+      <button class="chip-btn" data-amt="100">+100</button>
+    </div>
+
+    <div class="bj-actions">
+      <button class="primary-btn" id="deal-btn">Deal</button>
+      <button class="secondary-btn" id="hit-btn" disabled>Hit</button>
+      <button class="secondary-btn" id="stand-btn" disabled>Stand</button>
+    </div>
+  </section>
+</main>
+
+<footer>Play-money simulation • no real gambling, payment, or age verification involved</footer>
+
+<script>
+/* ============ Shared balance (same key as home.html / slots.html) ============ */
+const STORAGE_KEY = 'velvet-table-balance';
+let balance = Number(localStorage.getItem(STORAGE_KEY));
+if (!Number.isFinite(balance) || balance <= 0) balance = 1000;
+
+const balanceDisplay = document.getElementById('balance-display');
+function renderBalance(){
+  balanceDisplay.textContent = balance.toLocaleString();
+  localStorage.setItem(STORAGE_KEY, String(balance));
+}
+renderBalance();
+
+document.querySelectorAll('.chip-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const input = document.getElementById('bj-bet');
+    input.value = Math.max(1, Number(input.value || 0) + Number(btn.dataset.amt));
+  });
+});
+
+function takeBet(inputEl, msgEl){
+  const bet = Math.floor(Number(inputEl.value));
+  if (!Number.isFinite(bet) || bet <= 0){
+    msgEl.textContent = 'Enter a valid bet.';
+    msgEl.className = 'result-msg lose';
+    return null;
+  }
+  if (bet > balance){
+    msgEl.textContent = "You don't have enough chips for that bet.";
+    msgEl.className = 'result-msg lose';
+    return null;
+  }
+  return bet;
+}
+
+/* ============ Blackjack ============ */
+const RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+const SUITS = [{s:'♠',red:false},{s:'♣',red:false},{s:'♥',red:true},{s:'♦',red:true}];
+
+let deck = [];
+let dealerHand = [];
+let playerHand = [];
+let bjBet = 0;
+let bjActive = false;
+
+const dealerCardsEl = document.getElementById('dealer-cards');
+const playerCardsEl = document.getElementById('player-cards');
+const dealerTotalEl = document.getElementById('dealer-total');
+const playerTotalEl = document.getElementById('player-total');
+const bjMsg = document.getElementById('bj-msg');
+const bjBetInput = document.getElementById('bj-bet');
+const dealBtn = document.getElementById('deal-btn');
+const hitBtn = document.getElementById('hit-btn');
+const standBtn = document.getElementById('stand-btn');
+
+function freshDeck(){
+  const d = [];
+  for (const suit of SUITS){
+    for (const rank of RANKS){
+      d.push({ rank, suit: suit.s, red: suit.red });
+    }
+  }
+  for (let i = d.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [d[i], d[j]] = [d[j], d[i]];
+  }
+  return d;
+}
+
+function cardValue(card){
+  if (card.rank === 'A') return 11;
+  if (['J','Q','K'].includes(card.rank)) return 10;
+  return Number(card.rank);
+}
+
+function handTotal(hand){
+  let total = hand.reduce((sum, c) => sum + cardValue(c), 0);
+  let aces = hand.filter(c => c.rank === 'A').length;
+  while (total > 21 && aces > 0){
+    total -= 10;
+    aces--;
+  }
+  return total;
+}
+
+function renderCard(card){
+  const div = document.createElement('div');
+  div.className = 'card' + (card.red ? ' red' : '');
+  div.textContent = card.rank + card.suit;
+  return div;
+}
+
+function renderHands(hideDealerHole){
+  dealerCardsEl.innerHTML = '';
+  dealerHand.forEach((card, i) => {
+    if (hideDealerHole && i === 1){
+      const back = document.createElement('div');
+      back.className = 'card back';
+      dealerCardsEl.appendChild(back);
+    } else {
+      dealerCardsEl.appendChild(renderCard(card));
+    }
+  });
+
+  playerCardsEl.innerHTML = '';
+  playerHand.forEach(card => playerCardsEl.appendChild(renderCard(card)));
+
+  dealerTotalEl.textContent = hideDealerHole ? '?' : handTotal(dealerHand);
+  playerTotalEl.textContent = handTotal(playerHand);
+}
+
+dealBtn.addEventListener('click', () => {
+  const bet = takeBet(bjBetInput, bjMsg);
+  if (bet === null) return;
+
+  bjBet = bet;
+  balance -= bet;
+  renderBalance();
+
+  deck = freshDeck();
+  dealerHand = [deck.pop(), deck.pop()];
+  playerHand = [deck.pop(), deck.pop()];
+  bjActive = true;
+
+  renderHands(true);
+  bjMsg.textContent = 'Hit or stand?';
+  bjMsg.className = 'result-msg neutral';
+
+  dealBtn.disabled = true;
+  hitBtn.disabled = false;
+  standBtn.disabled = false;
+  bjBetInput.disabled = true;
+
+  if (handTotal(playerHand) === 21){
+    endBlackjack();
+  }
+});
+
+hitBtn.addEventListener('click', () => {
+  if (!bjActive) return;
+  playerHand.push(deck.pop());
+  renderHands(true);
+
+  if (handTotal(playerHand) > 21){
+    endBlackjack();
+  }
+});
+
+standBtn.addEventListener('click', () => {
+  if (!bjActive) return;
+  endBlackjack();
+});
+
+function endBlackjack(){
+  bjActive = false;
+  hitBtn.disabled = true;
+  standBtn.disabled = true;
+
+  const playerTotal = handTotal(playerHand);
+  let outcome;
+
+  if (playerTotal > 21){
+    outcome = 'bust';
+  } else {
+    while (handTotal(dealerHand) < 17){
+      dealerHand.push(deck.pop());
+    }
+    const dealerTotal = handTotal(dealerHand);
+
+    if (dealerTotal > 21) outcome = 'dealer-bust';
+    else if (playerTotal === dealerTotal) outcome = 'push';
+    else if (playerTotal > dealerTotal) outcome = 'win';
+    else outcome = 'lose';
+  }
+
+  renderHands(false);
+  settleBlackjack(outcome, playerTotal);
+}
+
+function settleBlackjack(outcome, playerTotal){
+  let winnings = 0;
+  let text = '';
+  let cls = 'neutral';
+
+  const blackjack = playerTotal === 21 && playerHand.length === 2;
+
+  switch (outcome){
+    case 'bust':
+      text = 'Bust — you went over 21.';
+      cls = 'lose';
+      break;
+    case 'dealer-bust':
+      winnings = blackjack ? Math.floor(bjBet * 2.5) : bjBet * 2;
+      text = `Dealer busts — you win ${winnings.toLocaleString()} chips!`;
+      cls = 'win';
+      break;
+    case 'win':
+      winnings = blackjack ? Math.floor(bjBet * 2.5) : bjBet * 2;
+      text = blackjack
+        ? `Blackjack! +${winnings.toLocaleString()} chips`
+        : `You win! +${winnings.toLocaleString()} chips`;
+      cls = 'win';
+      break;
+    case 'push':
+      winnings = bjBet;
+      text = 'Push — bet returned.';
+      cls = 'neutral';
+      break;
+    case 'lose':
+      text = 'Dealer wins.';
+      cls = 'lose';
+      break;
+  }
+
+  balance += winnings;
+  renderBalance();
+
+  bjMsg.textContent = text;
+  bjMsg.className = 'result-msg ' + cls;
+
+  dealBtn.disabled = false;
+  bjBetInput.disabled = false;
+}
+
+dealerTotalEl.textContent = '';
+playerTotalEl.textContent = '';
+</script>
+
+</body>
+</html>

@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Velvet Table - menu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green-dark:#0a2a20;
+    --green:#0e3b2c;
+    --green-light:#154a37;
+    --gold:#c9a227;
+    --gold-bright:#e8c85a;
+    --yellow:#f2c94c;
+    --white:#f5f3ec;
+    --white-pure:#ffffff;
+    --black:#0d0d0d;
+    --red:#a63d40;
+    --red-bright:#d3595c;
+    --grey:#8b948e;
+    --grey-dark:#3a423d;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 50% 0%, var(--green-light) 0%, var(--green) 45%, var(--green-dark) 100%);
+    color:var(--white);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+  }
+
+  h1, h2, h3, .display{ font-family:'Fraunces', serif; }
+
+  a{ color:inherit; }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    position:sticky;
+    top:0;
+    z-index:50;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:14px 28px;
+    background:rgba(13,13,13,0.85);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid rgba(201,162,39,0.3);
+  }
+
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:'Fraunces', serif;
+    font-size:20px;
+    font-weight:600;
+    color:var(--white-pure);
+    white-space:nowrap;
+  }
+  .brand .mark{
+    width:30px; height:30px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--gold-bright), var(--gold) 60%, #7a5f14 100%);
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px;
+    color:var(--black);
+  }
+
+  .topbar-right{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+
+  .balance-chip{
+    background:rgba(255,255,255,0.06);
+    border:1px solid var(--grey-dark);
+    border-radius:999px;
+    padding:7px 16px;
+    font-size:13.5px;
+    color:var(--yellow);
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    white-space:nowrap;
+  }
+  .balance-chip span.label{ color:var(--grey); font-weight:500; }
+
+  .icon-btn{
+    width:38px; height:38px;
+    border-radius:50%;
+    border:1px solid var(--grey-dark);
+    background:rgba(255,255,255,0.04);
+    color:var(--white);
+    font-size:17px;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .icon-btn:hover{ border-color:var(--gold); transform:rotate(25deg); }
+
+  .btn{
+    border:none;
+    border-radius:6px;
+    padding:9px 18px;
+    font-family:'Inter', sans-serif;
+    font-weight:600;
+    font-size:14px;
+    cursor:pointer;
+    transition:background .15s ease, transform .1s ease, border-color .15s ease;
+    white-space:nowrap;
+  }
+  .btn:active{ transform:scale(0.97); }
+
+  .btn-ghost{
+    background:transparent;
+    border:1px solid var(--grey);
+    color:var(--white);
+  }
+  .btn-ghost:hover{ border-color:var(--white-pure); }
+
+  .btn-gold{
+    background:var(--gold);
+    color:var(--black);
+  }
+  .btn-gold:hover{ background:var(--gold-bright); }
+
+  .btn-red{
+    background:var(--red);
+    color:var(--white-pure);
+  }
+  .btn-red:hover{ background:var(--red-bright); }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    max-width:1080px;
+    margin:0 auto;
+    padding:56px 28px 24px;
+    text-align:center;
+  }
+  .hero .kicker{
+    color:var(--yellow);
+    font-size:13px;
+    letter-spacing:0.02em;
+    margin:0 0 10px;
+  }
+  .hero h1{
+    font-size:clamp(30px, 5vw, 46px);
+    font-weight:600;
+    margin:0 0 12px;
+    color:var(--white-pure);
+  }
+  .hero p{
+    max-width:520px;
+    margin:0 auto;
+    color:var(--grey);
+    font-size:14.5px;
+    line-height:1.6;
+  }
+
+  /* ---------- Game grid ---------- */
+  .grid-section{
+    max-width:1080px;
+    margin:0 auto;
+    padding:20px 28px 70px;
+  }
+  .grid-section h2{
+    font-size:20px;
+    color:var(--white-pure);
+    margin:0 0 4px;
+    font-weight:600;
+  }
+  .grid-section .section-sub{
+    color:var(--grey);
+    font-size:13.5px;
+    margin:0 0 24px;
+  }
+
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(250px, 1fr));
+    gap:22px;
+  }
+
+  .game-card{
+    background:rgba(13,13,13,0.55);
+    border:1px solid var(--grey-dark);
+    border-radius:10px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .game-card:hover{ border-color:var(--gold); transform:translateY(-3px); }
+
+  /* This is the image slot. Swap the <img src="..."> below with your own
+     artwork (any size works — it's cropped to fill), or delete the
+     data-uri src entirely and point it at a real file / URL. */
+  .card-image-wrap{
+    position:relative;
+    aspect-ratio:16/10;
+    background:repeating-linear-gradient(135deg, var(--grey-dark), var(--grey-dark) 10px, #2b312c 10px, #2b312c 20px);
+  }
+  .card-image-wrap img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+
+  .badge{
+    position:absolute;
+    top:10px; left:10px;
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.02em;
+  }
+  .badge.popular{ background:var(--red); color:var(--white-pure); }
+  .badge.new{ background:var(--yellow); color:var(--black); }
+  .badge.soon{ background:rgba(0,0,0,0.6); color:var(--grey); border:1px solid var(--grey-dark); }
+
+  .card-body{
+    padding:16px 18px 18px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    flex:1;
+  }
+  .card-body h3{
+    margin:0;
+    font-size:18px;
+    color:var(--white-pure);
+    font-weight:600;
+  }
+  .card-body p{
+    margin:0;
+    font-size:13px;
+    color:var(--grey);
+    line-height:1.5;
+    flex:1;
+  }
+
+  .card-footer{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:6px;
+  }
+  .card-footer .odds{
+    font-size:11.5px;
+    color:var(--grey);
+  }
+
+  .play-btn{
+    background:var(--green-light);
+    color:var(--white-pure);
+    border:1px solid var(--gold);
+    border-radius:6px;
+    padding:7px 16px;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .play-btn:hover{ background:var(--gold); color:var(--black); }
+  .play-btn:disabled{
+    opacity:0.4;
+    cursor:not-allowed;
+    border-color:var(--grey-dark);
+  }
+
+  footer{
+    text-align:center;
+    padding:20px;
+    font-size:12px;
+    color:rgba(245,243,236,0.4);
+    border-top:1px solid rgba(201,162,39,0.15);
+  }
+
+  /* ---------- Modals ---------- */
+  .modal-backdrop{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.6);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:100;
+  }
+  .modal-backdrop.open{ display:flex; }
+
+  .modal{
+    background:var(--black);
+    border:1px solid var(--gold);
+    border-radius:10px;
+    width:100%;
+    max-width:380px;
+    padding:26px;
+  }
+  .modal h2{
+    margin:0 0 4px;
+    font-size:21px;
+    color:var(--white-pure);
+  }
+  .modal .modal-sub{
+    margin:0 0 20px;
+    font-size:12.5px;
+    color:var(--grey);
+  }
+
+  .field{
+    margin-bottom:14px;
+  }
+  .field label{
+    display:block;
+    font-size:12.5px;
+    color:var(--grey);
+    margin-bottom:5px;
+  }
+  .field input[type=text],
+  .field input[type=email],
+  .field input[type=password]{
+    width:100%;
+    background:rgba(255,255,255,0.05);
+    border:1px solid var(--grey-dark);
+    color:var(--white);
+    padding:9px 11px;
+    border-radius:6px;
+    font-family:'Inter', sans-serif;
+    font-size:14px;
+  }
+  .field input:focus{ outline:none; border-color:var(--gold); }
+
+  .modal-actions{
+    display:flex;
+    gap:10px;
+    margin-top:18px;
+  }
+  .modal-actions .btn{ flex:1; }
+
+  .modal-msg{
+    margin-top:12px;
+    font-size:12.5px;
+    color:var(--yellow);
+    text-align:center;
+    min-height:16px;
+  }
+
+  .switch-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 0;
+    border-bottom:1px solid var(--grey-dark);
+  }
+  .switch-row:last-of-type{ border-bottom:none; }
+  .switch-row span.row-label{ font-size:14px; color:var(--white); }
+  .switch-row span.row-sub{ display:block; font-size:11.5px; color:var(--grey); margin-top:2px; }
+
+  .toggle{
+    position:relative;
+    width:42px; height:24px;
+    flex-shrink:0;
+  }
+  .toggle input{ opacity:0; width:0; height:0; }
+  .toggle .slider{
+    position:absolute; inset:0;
+    background:var(--grey-dark);
+    border-radius:999px;
+    cursor:pointer;
+    transition:background .15s ease;
+  }
+  .toggle .slider::before{
+    content:'';
+    position:absolute;
+    width:18px; height:18px;
+    left:3px; top:3px;
+    background:var(--white-pure);
+    border-radius:50%;
+    transition:transform .15s ease;
+  }
+  .toggle input:checked + .slider{ background:var(--gold); }
+  .toggle input:checked + .slider::before{ transform:translateX(18px); }
+
+  .switch-link{
+    text-align:center;
+    font-size:12.5px;
+    color:var(--grey);
+    margin-top:14px;
+  }
+  .switch-link button{
+    background:none;
+    border:none;
+    color:var(--yellow);
+    cursor:pointer;
+    font-size:12.5px;
+    text-decoration:underline;
+    padding:0;
+  }
+
+  .close-x{
+    position:absolute;
+    top:14px; right:16px;
+    background:none;
+    border:none;
+    color:var(--grey);
+    font-size:18px;
+    cursor:pointer;
+  }
+  .modal{ position:relative; }
+</style>
+</head>
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<div class="topbar">
+  <div class="brand">
+    <span class="mark">♠</span>
+    The Velvet Table
+  </div>
+
+  <div class="topbar-right">
+    <div class="balance-chip">
+      <span class="label">Chips</span>
+      <span id="balance-display">1,000</span>
+    </div>
+    <button class="icon-btn" id="settings-btn" title="Settings" aria-label="Settings">⚙</button>
+    <button class="btn btn-ghost" id="login-open-btn">Log In</button>
+    <button class="btn btn-gold" id="signup-open-btn">Sign Up</button>
+  </div>
+</div>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <p class="kicker">CS PROJECT — PLAY MONEY ONLY</p>
+  <h1>Welcome back to the lobby</h1>
+  <p>Pick a table below. Every chip on this site is simulated — there's no real money, no payment, and no payout involved.</p>
+</section>
+
+<!-- ============ GAME GRID ============ -->
+<section class="grid-section">
+  <h2>Tables</h2>
+  <p class="section-sub">Click a card's image to see where your own artwork drops in.</p>
+
+  <div class="card-grid">
+
+    <!-- Card 1: Slots -->
+    <article class="game-card">
+      <div class="card-image-wrap">
+        <span class="badge popular">Popular</span>
+        <img src="" alt="Golden Reels slot machine" data-placeholder-label="Golden Reels" class="game-image">
+      </div>
+      <div class="card-body">
+        <h3>Golden Reels</h3>
+        <p>Three-reel slots. Match symbols across the payline for up to 20× your bet.</p>
+        <div class="card-footer">
+          <span class="odds">Pays up to 20×</span>
+          <button class="play-btn" data-href="casino.html"><a href="Slots+21.html">Play</a></button>
+        </div>
+      </div>
+    </article>
+
+    <!-- Card 2: Blackjack -->
+    <article class="game-card">
+      <div class="card-image-wrap">
+        <span class="badge new">New</span>
+        <img src="" alt="Twenty-One blackjack table" data-placeholder-label="Twenty-One" class="game-image">
+      </div>
+      <div class="card-body">
+        <h3>Twenty-One</h3>
+        <p>Classic blackjack against the house. Dealer stands on 17, blackjack pays 3:2.</p>
+        <div class="card-footer">
+          <span class="odds">Pays 3:2 on blackjack</span>
+          <button class="play-btn" data-href="casino.html">Play</button>
+        </div>
+      </div>
+    </article>
+
+    <!-- Card 3: Roulette (placeholder game) -->
+    <article class="game-card">
+      <div class="card-image-wrap">
+        <span class="badge soon">Coming soon</span>
+        <img src="" alt="Roulette Royale wheel" data-placeholder-label="Roulette Royale" class="game-image">
+      </div>
+      <div class="card-body">
+        <h3>Roulette Royale</h3>
+        <p>Red, black, or a single number — the wheel decides. In development.</p>
+        <div class="card-footer">
+          <span class="odds">Pays up to 35×</span>
+          <button class="play-btn" disabled>Coming soon</button>
+        </div>
+      </div>
+    </article>
+
+    <!-- Card 4: Poker (placeholder game) -->
+    <article class="game-card">
+      <div class="card-image-wrap">
+        <span class="badge soon">Coming soon</span>
+        <img src="" alt="Poker Table" data-placeholder-label="Poker Table" class="game-image">
+      </div>
+      <div class="card-body">
+        <h3>Poker Table</h3>
+        <p>Five-card draw against the house. Still being dealt into the lobby.</p>
+        <div class="card-footer">
+          <span class="odds">Pays up to 250×</span>
+          <button class="play-btn" disabled>Coming soon</button>
+        </div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<footer>Play-money simulation • no real gambling, payment, or age verification involved</footer>
+
+<!-- ============ SETTINGS MODAL ============ -->
+<div class="modal-backdrop" id="settings-backdrop">
+  <div class="modal">
+    <button class="close-x" data-close="settings-backdrop">✕</button>
+    <h2>Settings</h2>
+    <p class="modal-sub">These are local to your browser only.</p>
+
+    <div class="switch-row">
+      <div>
+        <span class="row-label">Sound effects</span>
+        <span class="row-sub">Spin and card sounds</span>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="sound-toggle" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="switch-row">
+      <div>
+        <span class="row-label">Reduced motion</span>
+        <span class="row-sub">Turns off spin/deal animations</span>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="motion-toggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-red" id="reset-balance-btn">Reset chips</button>
+      <button class="btn btn-gold" data-close="settings-backdrop">Done</button>
+    </div>
+    <div class="modal-msg" id="settings-msg"></div>
+  </div>
+</div>
+
+<!-- ============ LOG IN MODAL ============ -->
+<div class="modal-backdrop" id="login-backdrop">
+  <div class="modal">
+    <button class="close-x" data-close="login-backdrop">✕</button>
+    <h2>Log in</h2>
+    <p class="modal-sub">Demo only — no account is actually created or checked.</p>
+
+    <form id="login-form">
+      <div class="field">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" placeholder="you@example.com" required>
+      </div>
+      <div class="field">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" placeholder="••••••••" required>
+      </div>
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-gold" style="flex:1;">Log in</button>
+      </div>
+    </form>
+    <div class="modal-msg" id="login-msg"></div>
+    <p class="switch-link">No account? <button type="button" id="switch-to-signup">Sign up instead</button></p>
+  </div>
+</div>
+
+<!-- ============ SIGN UP MODAL ============ -->
+<div class="modal-backdrop" id="signup-backdrop">
+  <div class="modal">
+    <button class="close-x" data-close="signup-backdrop">✕</button>
+    <h2>Sign up</h2>
+    <p class="modal-sub">Demo only — no account is actually created or stored anywhere.</p>
+
+    <form id="signup-form">
+      <div class="field">
+        <label for="signup-name">Display name</label>
+        <input type="text" id="signup-name" placeholder="e.g. HighRoller99" required>
+      </div>
+      <div class="field">
+        <label for="signup-email">Email</label>
+        <input type="email" id="signup-email" placeholder="you@example.com" required>
+      </div>
+      <div class="field">
+        <label for="signup-password">Password</label>
+        <input type="password" id="signup-password" placeholder="••••••••" required>
+      </div>
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-gold" style="flex:1;">Create account</button>
+      </div>
+    </form>
+    <div class="modal-msg" id="signup-msg"></div>
+    <p class="switch-link">Already have one? <button type="button" id="switch-to-login">Log in instead</button></p>
+  </div>
+</div>
+
+<script>
+/* ============ Balance (shared with casino.html via localStorage) ============ */
+const STORAGE_KEY = 'velvet-table-balance';
+let balance = Number(localStorage.getItem(STORAGE_KEY));
+if (!Number.isFinite(balance) || balance <= 0) balance = 1000;
+
+const balanceDisplay = document.getElementById('balance-display');
+function renderBalance(){
+  balanceDisplay.textContent = balance.toLocaleString();
+  localStorage.setItem(STORAGE_KEY, String(balance));
+}
+renderBalance();
+
+/* ============ Placeholder game images ============
+   Each <img class="game-image"> starts with an empty src. If it's empty,
+   we generate a simple labeled placeholder graphic on the fly so the
+   layout looks right before real art is added. To use your own image,
+   just set the src attribute in the HTML, e.g.:
+     <img src="images/golden-reels.jpg" ...>
+   and delete the data-placeholder-label attribute (or leave it — it's
+   only read when src is empty).
+*/
+function placeholderDataUri(label){
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="400" height="250">
+      <rect width="100%" height="100%" fill="#1c2420"/>
+      <rect x="0" y="0" width="100%" height="100%" fill="none" stroke="#3a423d" stroke-width="2"/>
+      <text x="50%" y="46%" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#8b948e">Game image slot</text>
+      <text x="50%" y="60%" text-anchor="middle" font-family="serif" font-size="20" fill="#c9a227">${label}</text>
+    </svg>`;
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+}
+
+document.querySelectorAll('.game-image').forEach(img => {
+  if (!img.getAttribute('src')){
+    img.src = placeholderDataUri(img.dataset.placeholderLabel || 'Add image');
+  }
+});
+
+/* ============ Play buttons ============ */
+document.querySelectorAll('.play-btn[data-href]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    window.location.href = btn.dataset.href;
+  });
+});
+
+/* ============ Modal open/close helpers ============ */
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('[data-close]').forEach(el => {
+  el.addEventListener('click', () => closeModal(el.dataset.close));
+});
+document.querySelectorAll('.modal-backdrop').forEach(bd => {
+  bd.addEventListener('click', e => { if (e.target === bd) bd.classList.remove('open'); });
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape'){
+    document.querySelectorAll('.modal-backdrop.open').forEach(bd => bd.classList.remove('open'));
+  }
+});
+
+/* ============ Settings ============ */
+document.getElementById('settings-btn').addEventListener('click', () => openModal('settings-backdrop'));
+
+document.getElementById('reset-balance-btn').addEventListener('click', () => {
+  balance = 1000;
+  renderBalance();
+  const msg = document.getElementById('settings-msg');
+  msg.textContent = 'Balance reset to 1,000 chips.';
+  setTimeout(() => { msg.textContent = ''; }, 2500);
+});
+
+/* Sound / reduced-motion toggles are stored so casino.html could read
+   them too, but no audio is wired up yet in this prototype. */
+const soundToggle = document.getElementById('sound-toggle');
+const motionToggle = document.getElementById('motion-toggle');
+soundToggle.checked = localStorage.getItem('vt-sound') !== 'off';
+motionToggle.checked = localStorage.getItem('vt-reduced-motion') === 'on';
+soundToggle.addEventListener('change', () => {
+  localStorage.setItem('vt-sound', soundToggle.checked ? 'on' : 'off');
+});
+motionToggle.addEventListener('change', () => {
+  localStorage.setItem('vt-reduced-motion', motionToggle.checked ? 'on' : 'off');
+});
+
+/* ============ Log in / Sign up ============ */
+document.getElementById('login-open-btn').addEventListener('click', () => openModal('login-backdrop'));
+document.getElementById('signup-open-btn').addEventListener('click', () => openModal('signup-backdrop'));
+
+document.getElementById('switch-to-signup').addEventListener('click', () => {
+  closeModal('login-backdrop');
+  openModal('signup-backdrop');
+});
+document.getElementById('switch-to-login').addEventListener('click', () => {
+  closeModal('signup-backdrop');
+  openModal('login-backdrop');
+});
+
+document.getElementById('login-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value;
+  document.getElementById('login-msg').textContent =
+    `This is a demo — "${email}" was not actually checked or logged in anywhere.`;
+});
+
+document.getElementById('signup-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = document.getElementById('signup-name').value;
+  document.getElementById('signup-msg').textContent =
+    `This is a demo — no account for "${name}" was actually created or stored.`;
+});
+</script>
+
+</body>
+</html>
