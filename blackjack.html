@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="hu">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>21 — The Velvet Table</title>
+<title>Twenty-One — The Velvet Table</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -100,7 +100,7 @@
 
   /* ---------- Game area ---------- */
   main{
-    max-width:560px;
+    max-width:600px;
     margin:0 auto;
     padding:48px 24px 70px;
   }
@@ -121,16 +121,19 @@
     margin:0 0 26px;
     font-size:13.5px;
     color:var(--grey);
+    line-height:1.5;
   }
 
   .bj-zone{ margin-bottom:20px; }
-  .bj-zone .zone-label{
+  .zone-label{
     font-size:12.5px;
     color:var(--grey);
     display:flex;
     justify-content:space-between;
     margin-bottom:8px;
   }
+  .zone-label .total{ color:var(--white); font-weight:600; }
+
   .card-row{
     display:flex;
     gap:8px;
@@ -154,6 +157,18 @@
   .card.red{ color:var(--red); }
   .card.back{
     background:repeating-linear-gradient(45deg, var(--green-light), var(--green-light) 4px, var(--gold) 4px, var(--gold) 8px);
+  }
+
+  /* Player hands (one normally, two after a split) */
+  .hand-block{
+    padding:10px 12px;
+    border:1px solid transparent;
+    border-radius:8px;
+    margin-bottom:8px;
+  }
+  .hand-block.active{
+    border-color:var(--gold);
+    background:rgba(201,162,39,0.08);
   }
 
   .result-msg{
@@ -200,7 +215,8 @@
     cursor:pointer;
     transition:background .15s ease;
   }
-  .chip-btn:hover{ background:rgba(201,162,39,0.3); }
+  .chip-btn:hover:not(:disabled){ background:rgba(201,162,39,0.3); }
+  .chip-btn:disabled{ opacity:0.4; cursor:not-allowed; }
 
   .bj-actions{
     display:flex;
@@ -238,6 +254,20 @@
   .secondary-btn:hover:not(:disabled){ color:var(--white-pure); border-color:var(--white-pure); }
   .secondary-btn:disabled{ opacity:0.35; cursor:not-allowed; }
 
+  .split-btn{
+    flex:1;
+    background:transparent;
+    border:1px solid var(--yellow);
+    color:var(--yellow);
+    padding:13px 18px;
+    border-radius:6px;
+    font-size:14.5px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .split-btn:hover:not(:disabled){ background:rgba(242,201,76,0.15); }
+  .split-btn:disabled{ opacity:0.3; cursor:not-allowed; border-color:var(--grey-dark); color:var(--grey); }
+
   footer{
     text-align:center;
     padding:20px;
@@ -262,17 +292,18 @@
 <main>
   <section class="table-card">
     <h2>Twenty-One</h2>
-    <p class="sub">Beat the dealer without going over 21. Dealer stands on 17.</p>
+    <p class="sub">
+      Beat the dealer without going over 21. You see only one of the dealer's cards —
+      if the dealer has blackjack, the round ends immediately.
+      Got two cards of the same value? You can split them into two hands.
+    </p>
 
     <div class="bj-zone">
-      <div class="zone-label"><span>Dealer</span><span id="dealer-total"></span></div>
+      <div class="zone-label"><span>Dealer</span><span class="total" id="dealer-total"></span></div>
       <div class="card-row" id="dealer-cards"></div>
     </div>
 
-    <div class="bj-zone">
-      <div class="zone-label"><span>You</span><span id="player-total"></span></div>
-      <div class="card-row" id="player-cards"></div>
-    </div>
+    <div id="player-hands"></div>
 
     <div class="result-msg neutral" id="bj-msg">Place a bet to deal in.</div>
 
@@ -288,6 +319,7 @@
       <button class="primary-btn" id="deal-btn">Deal</button>
       <button class="secondary-btn" id="hit-btn" disabled>Hit</button>
       <button class="secondary-btn" id="stand-btn" disabled>Stand</button>
+      <button class="split-btn" id="split-btn" disabled>Split</button>
     </div>
   </section>
 </main>
@@ -307,7 +339,8 @@ function renderBalance(){
 }
 renderBalance();
 
-document.querySelectorAll('.chip-btn').forEach(btn => {
+const chipBtns = document.querySelectorAll('.chip-btn');
+chipBtns.forEach(btn => {
   btn.addEventListener('click', () => {
     const input = document.getElementById('bj-bet');
     input.value = Math.max(1, Number(input.value || 0) + Number(btn.dataset.amt));
@@ -335,19 +368,21 @@ const SUITS = [{s:'♠',red:false},{s:'♣',red:false},{s:'♥',red:true},{s:'�
 
 let deck = [];
 let dealerHand = [];
-let playerHand = [];
-let bjBet = 0;
-let bjActive = false;
+// Each player hand: { cards: [...], bet: number, status: 'playing' | 'stand' | 'bust' }
+let hands = [];
+let activeIdx = 0;
+let hasSplit = false;
+let roundActive = false;
 
 const dealerCardsEl = document.getElementById('dealer-cards');
-const playerCardsEl = document.getElementById('player-cards');
 const dealerTotalEl = document.getElementById('dealer-total');
-const playerTotalEl = document.getElementById('player-total');
+const playerHandsEl = document.getElementById('player-hands');
 const bjMsg = document.getElementById('bj-msg');
 const bjBetInput = document.getElementById('bj-bet');
 const dealBtn = document.getElementById('deal-btn');
 const hitBtn = document.getElementById('hit-btn');
 const standBtn = document.getElementById('stand-btn');
+const splitBtn = document.getElementById('split-btn');
 
 function freshDeck(){
   const d = [];
@@ -369,9 +404,9 @@ function cardValue(card){
   return Number(card.rank);
 }
 
-function handTotal(hand){
-  let total = hand.reduce((sum, c) => sum + cardValue(c), 0);
-  let aces = hand.filter(c => c.rank === 'A').length;
+function handTotal(cards){
+  let total = cards.reduce((sum, c) => sum + cardValue(c), 0);
+  let aces = cards.filter(c => c.rank === 'A').length;
   while (total > 21 && aces > 0){
     total -= 10;
     aces--;
@@ -379,6 +414,11 @@ function handTotal(hand){
   return total;
 }
 
+function isNaturalBlackjack(cards){
+  return cards.length === 2 && handTotal(cards) === 21;
+}
+
+/* ---------- Rendering ---------- */
 function renderCard(card){
   const div = document.createElement('div');
   div.className = 'card' + (card.red ? ' red' : '');
@@ -386,7 +426,8 @@ function renderCard(card){
   return div;
 }
 
-function renderHands(hideDealerHole){
+function renderTable(hideDealerHole){
+  // Dealer: first card always face up, second card hidden until the round is over
   dealerCardsEl.innerHTML = '';
   dealerHand.forEach((card, i) => {
     if (hideDealerHole && i === 1){
@@ -397,129 +438,227 @@ function renderHands(hideDealerHole){
       dealerCardsEl.appendChild(renderCard(card));
     }
   });
+  dealerTotalEl.textContent = dealerHand.length === 0
+    ? ''
+    : hideDealerHole
+      ? `Showing ${cardValue(dealerHand[0])}`
+      : `Total ${handTotal(dealerHand)}`;
 
-  playerCardsEl.innerHTML = '';
-  playerHand.forEach(card => playerCardsEl.appendChild(renderCard(card)));
+  // Player: one block per hand
+  playerHandsEl.innerHTML = '';
+  hands.forEach((hand, i) => {
+    const block = document.createElement('div');
+    block.className = 'hand-block';
+    if (roundActive && hands.length > 1 && i === activeIdx) block.classList.add('active');
 
-  dealerTotalEl.textContent = hideDealerHole ? '?' : handTotal(dealerHand);
-  playerTotalEl.textContent = handTotal(playerHand);
+    const label = document.createElement('div');
+    label.className = 'zone-label';
+    const left = document.createElement('span');
+    left.textContent = hands.length > 1 ? `Hand ${i + 1} · bet ${hand.bet}` : 'You';
+    const right = document.createElement('span');
+    right.className = 'total';
+    right.textContent = `Total ${handTotal(hand.cards)}`;
+    label.appendChild(left);
+    label.appendChild(right);
+
+    const row = document.createElement('div');
+    row.className = 'card-row';
+    hand.cards.forEach(card => row.appendChild(renderCard(card)));
+
+    block.appendChild(label);
+    block.appendChild(row);
+    playerHandsEl.appendChild(block);
+  });
 }
 
+function canSplit(){
+  if (!roundActive || hasSplit || hands.length !== 1) return false;
+  const h = hands[0];
+  return h.cards.length === 2
+    && cardValue(h.cards[0]) === cardValue(h.cards[1])
+    && balance >= h.bet;
+}
+
+function updateButtons(){
+  hitBtn.disabled = !roundActive;
+  standBtn.disabled = !roundActive;
+  splitBtn.disabled = !canSplit();
+}
+
+function setRoundControls(inRound){
+  dealBtn.disabled = inRound;
+  bjBetInput.disabled = inRound;
+  chipBtns.forEach(b => b.disabled = inRound);
+}
+
+function setMessage(text, cls){
+  bjMsg.textContent = text;
+  bjMsg.className = 'result-msg ' + (cls || 'neutral');
+}
+
+function endRound(){
+  roundActive = false;
+  setRoundControls(false);
+  updateButtons();
+}
+
+/* ---------- Deal ---------- */
 dealBtn.addEventListener('click', () => {
   const bet = takeBet(bjBetInput, bjMsg);
   if (bet === null) return;
 
-  bjBet = bet;
   balance -= bet;
   renderBalance();
 
   deck = freshDeck();
-  dealerHand = [deck.pop(), deck.pop()];
-  playerHand = [deck.pop(), deck.pop()];
-  bjActive = true;
+  dealerHand = [deck.pop(), deck.pop()];   // [0] = face-up card, [1] = hidden hole card
+  hands = [{ cards: [deck.pop(), deck.pop()], bet, status: 'playing' }];
+  activeIdx = 0;
+  hasSplit = false;
+  roundActive = true;
+  setRoundControls(true);
 
-  renderHands(true);
-  bjMsg.textContent = 'Hit or stand?';
-  bjMsg.className = 'result-msg neutral';
+  const playerBJ = isNaturalBlackjack(hands[0].cards);
+  const dealerBJ = isNaturalBlackjack(dealerHand);
 
-  dealBtn.disabled = true;
-  hitBtn.disabled = false;
-  standBtn.disabled = false;
-  bjBetInput.disabled = true;
+  // Dealer checks for blackjack right away. If either side has one, the round is over immediately.
+  if (dealerBJ || playerBJ){
+    roundActive = false;
+    renderTable(false);   // reveal the hole card
 
-  if (handTotal(playerHand) === 21){
-    endBlackjack();
+    if (dealerBJ && playerBJ){
+      balance += bet;
+      setMessage('Both you and the dealer have blackjack — push, bet returned.', 'neutral');
+    } else if (dealerBJ){
+      setMessage('Dealer has blackjack — round over. You lose your bet.', 'lose');
+    } else {
+      const winnings = Math.floor(bet * 2.5);
+      balance += winnings;
+      setMessage(`Blackjack! +${(winnings - bet).toLocaleString()} chips`, 'win');
+    }
+    renderBalance();
+    endRound();
+    return;
   }
+
+  renderTable(true);
+  setMessage('Hit, stand' + (canSplit() ? ', or split?' : '?'), 'neutral');
+  updateButtons();
 });
 
+/* ---------- Player actions ---------- */
 hitBtn.addEventListener('click', () => {
-  if (!bjActive) return;
-  playerHand.push(deck.pop());
-  renderHands(true);
-
-  if (handTotal(playerHand) > 21){
-    endBlackjack();
-  }
+  if (!roundActive) return;
+  hands[activeIdx].cards.push(deck.pop());
+  afterAction();
 });
 
 standBtn.addEventListener('click', () => {
-  if (!bjActive) return;
-  endBlackjack();
+  if (!roundActive) return;
+  hands[activeIdx].status = 'stand';
+  afterAction();
 });
 
-function endBlackjack(){
-  bjActive = false;
-  hitBtn.disabled = true;
-  standBtn.disabled = true;
+splitBtn.addEventListener('click', () => {
+  if (!canSplit()) return;
+  const h = hands[0];
 
-  const playerTotal = handTotal(playerHand);
-  let outcome;
+  balance -= h.bet;   // second hand needs its own matching bet
+  renderBalance();
+  hasSplit = true;
 
-  if (playerTotal > 21){
-    outcome = 'bust';
-  } else {
+  const [c1, c2] = h.cards;
+  hands = [
+    { cards: [c1, deck.pop()], bet: h.bet, status: 'playing' },
+    { cards: [c2, deck.pop()], bet: h.bet, status: 'playing' }
+  ];
+  activeIdx = 0;
+  afterAction();
+});
+
+// Moves on from any hand that is finished (bust or 21), then either
+// continues with the next hand or lets the dealer play.
+function afterAction(){
+  while (activeIdx < hands.length){
+    const h = hands[activeIdx];
+    const total = handTotal(h.cards);
+    if (total > 21) h.status = 'bust';
+    else if (total === 21) h.status = 'stand';
+
+    if (h.status === 'playing') break;
+    activeIdx++;
+  }
+
+  if (activeIdx >= hands.length){
+    finishRound();
+    return;
+  }
+
+  renderTable(true);
+  setMessage(
+    hands.length > 1 ? `Hand ${activeIdx + 1}: hit or stand?` : 'Hit or stand?',
+    'neutral'
+  );
+  updateButtons();
+}
+
+/* ---------- Dealer plays, then settle every hand ---------- */
+function finishRound(){
+  roundActive = false;
+
+  const anyStillIn = hands.some(h => h.status !== 'bust');
+  if (anyStillIn){
     while (handTotal(dealerHand) < 17){
       dealerHand.push(deck.pop());
     }
-    const dealerTotal = handTotal(dealerHand);
-
-    if (dealerTotal > 21) outcome = 'dealer-bust';
-    else if (playerTotal === dealerTotal) outcome = 'push';
-    else if (playerTotal > dealerTotal) outcome = 'win';
-    else outcome = 'lose';
   }
+  const dealerTotal = handTotal(dealerHand);
 
-  renderHands(false);
-  settleBlackjack(outcome, playerTotal);
-}
+  const results = hands.map(h => {
+    const total = handTotal(h.cards);
+    let key, ret;
+    if (total > 21){ key = 'bust'; ret = 0; }
+    else if (dealerTotal > 21){ key = 'dealer-bust'; ret = h.bet * 2; }
+    else if (total > dealerTotal){ key = 'win'; ret = h.bet * 2; }
+    else if (total === dealerTotal){ key = 'push'; ret = h.bet; }
+    else { key = 'lose'; ret = 0; }
+    return { key, ret, bet: h.bet };
+  });
 
-function settleBlackjack(outcome, playerTotal){
-  let winnings = 0;
-  let text = '';
-  let cls = 'neutral';
-
-  const blackjack = playerTotal === 21 && playerHand.length === 2;
-
-  switch (outcome){
-    case 'bust':
-      text = 'Bust — you went over 21.';
-      cls = 'lose';
-      break;
-    case 'dealer-bust':
-      winnings = blackjack ? Math.floor(bjBet * 2.5) : bjBet * 2;
-      text = `Dealer busts — you win ${winnings.toLocaleString()} chips!`;
-      cls = 'win';
-      break;
-    case 'win':
-      winnings = blackjack ? Math.floor(bjBet * 2.5) : bjBet * 2;
-      text = blackjack
-        ? `Blackjack! +${winnings.toLocaleString()} chips`
-        : `You win! +${winnings.toLocaleString()} chips`;
-      cls = 'win';
-      break;
-    case 'push':
-      winnings = bjBet;
-      text = 'Push — bet returned.';
-      cls = 'neutral';
-      break;
-    case 'lose':
-      text = 'Dealer wins.';
-      cls = 'lose';
-      break;
-  }
-
-  balance += winnings;
+  const totalReturned = results.reduce((s, r) => s + r.ret, 0);
+  const totalBet = results.reduce((s, r) => s + r.bet, 0);
+  balance += totalReturned;
   renderBalance();
+  renderTable(false);
 
-  bjMsg.textContent = text;
-  bjMsg.className = 'result-msg ' + cls;
+  let text;
+  if (results.length === 1){
+    const r = results[0];
+    text = {
+      'bust': 'Bust — you went over 21.',
+      'dealer-bust': `Dealer busts — you win +${r.bet.toLocaleString()} chips!`,
+      'win': `You win! +${r.bet.toLocaleString()} chips`,
+      'push': 'Push — bet returned.',
+      'lose': 'Dealer wins.'
+    }[r.key];
+  } else {
+    const short = r => ({
+      'bust': 'bust',
+      'dealer-bust': `won +${r.bet}`,
+      'win': `won +${r.bet}`,
+      'push': 'push',
+      'lose': 'lost'
+    }[r.key]);
+    text = results.map((r, i) => `Hand ${i + 1}: ${short(r)}`).join('  •  ');
+  }
 
-  dealBtn.disabled = false;
-  bjBetInput.disabled = false;
+  const cls = totalReturned > totalBet ? 'win' : totalReturned === totalBet ? 'neutral' : 'lose';
+  setMessage(text, cls);
+  endRound();
 }
 
+// initial empty state
 dealerTotalEl.textContent = '';
-playerTotalEl.textContent = '';
 </script>
 
 </body>
