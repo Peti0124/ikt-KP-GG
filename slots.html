@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="hu">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>slots — The Velvet Table</title>
+<title>Golden Reels — The Velvet Table</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -98,6 +98,19 @@
     flex-wrap:wrap;
   }
 
+  .icon-btn{
+    width:38px; height:38px;
+    border-radius:50%;
+    border:1px solid var(--grey-dark);
+    background:rgba(255,255,255,0.04);
+    color:var(--white);
+    font-size:17px;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .icon-btn:hover{ border-color:var(--gold); transform:rotate(25deg); }
+
   /* ---------- Game area ---------- */
   main{
     max-width:560px;
@@ -123,6 +136,7 @@
     color:var(--grey);
   }
 
+  /* ---------- Reels ---------- */
   .reels{
     display:flex;
     justify-content:center;
@@ -132,13 +146,13 @@
   .reel{
     width:96px;
     height:104px;
+    padding:8px;
     background:radial-gradient(circle at 50% 30%, #1c5c44, #0a2a20);
     border:2px solid var(--gold);
     border-radius:8px;
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:48px;
     overflow:hidden;
   }
   .reel.spinning{ animation:blur 0.08s linear infinite; }
@@ -146,6 +160,15 @@
     0%{ filter:blur(0px); }
     50%{ filter:blur(3px); }
     100%{ filter:blur(0px); }
+  }
+  /* This is the image slot for each reel symbol. Swap the sources in
+     SYMBOL_SRC near the top of the script below with your own artwork —
+     nothing else needs to change. Left empty, a placeholder graphic is
+     generated automatically so the reels still look right meanwhile. */
+  .reel-img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
   }
 
   .result-msg{
@@ -159,20 +182,21 @@
   .result-msg.lose{ color:var(--red-bright); }
   .result-msg.neutral{ color:var(--grey); }
 
-  .bet-row{
+  /* ---------- Bet row ---------- */
+  .bet-row, .auto-row{
     display:flex;
     align-items:center;
     justify-content:center;
     gap:10px;
-    margin-bottom:22px;
+    margin-bottom:18px;
     flex-wrap:wrap;
   }
-  .bet-row label{
+  .bet-row label, .auto-row label{
     font-size:13px;
     color:var(--grey);
     margin-right:2px;
   }
-  .bet-row input[type=number]{
+  .bet-row input[type=number], .auto-row input[type=number]{
     width:90px;
     background:rgba(0,0,0,0.3);
     border:1px solid rgba(201,162,39,0.4);
@@ -182,6 +206,8 @@
     font-family:'Inter', sans-serif;
     font-size:15px;
   }
+  .bet-row input:disabled, .auto-row input:disabled{ opacity:0.5; }
+
   .chip-btn{
     background:rgba(201,162,39,0.15);
     border:1px solid var(--gold);
@@ -192,7 +218,8 @@
     cursor:pointer;
     transition:background .15s ease;
   }
-  .chip-btn:hover{ background:rgba(201,162,39,0.3); }
+  .chip-btn:hover:not(:disabled){ background:rgba(201,162,39,0.3); }
+  .chip-btn:disabled{ opacity:0.4; cursor:not-allowed; }
 
   .primary-btn{
     display:block;
@@ -207,10 +234,58 @@
     font-size:15px;
     cursor:pointer;
     transition:background .15s ease, transform .1s ease;
+    margin-bottom:22px;
   }
   .primary-btn:hover:not(:disabled){ background:var(--gold-bright); }
   .primary-btn:disabled{ opacity:0.4; cursor:not-allowed; }
   .primary-btn:active:not(:disabled){ transform:scale(0.98); }
+
+  /* ---------- Auto spin ---------- */
+  .auto-section{
+    margin-top:6px;
+    padding-top:22px;
+    border-top:1px dashed rgba(201,162,39,0.3);
+  }
+  .auto-section h3{
+    margin:0 0 4px;
+    font-size:15px;
+    color:var(--white-pure);
+    font-weight:600;
+  }
+  .auto-section .auto-sub{
+    margin:0 0 14px;
+    font-size:12.5px;
+    color:var(--grey);
+  }
+  .auto-actions{
+    display:flex;
+    gap:10px;
+    margin-bottom:12px;
+  }
+  .auto-btn{
+    flex:1;
+    border:none;
+    border-radius:6px;
+    padding:11px 16px;
+    font-family:'Inter', sans-serif;
+    font-weight:600;
+    font-size:14px;
+    cursor:pointer;
+    transition:background .15s ease, transform .1s ease;
+  }
+  .auto-btn:active:not(:disabled){ transform:scale(0.98); }
+  .auto-btn.start{ background:var(--gold); color:var(--black); }
+  .auto-btn.start:hover:not(:disabled){ background:var(--gold-bright); }
+  .auto-btn.stop{ background:var(--red); color:var(--white-pure); }
+  .auto-btn.stop:hover:not(:disabled){ background:var(--red-bright); }
+  .auto-btn:disabled{ opacity:0.35; cursor:not-allowed; }
+
+  .auto-status{
+    text-align:center;
+    font-size:12.5px;
+    color:var(--yellow);
+    min-height:16px;
+  }
 
   .paytable{
     margin-top:24px;
@@ -218,7 +293,16 @@
     border-top:1px dashed rgba(201,162,39,0.3);
     font-size:12.5px;
     color:var(--grey);
-    line-height:1.9;
+  }
+  .paytable .pay-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:4px 0;
+  }
+  .paytable .pay-row img{
+    width:22px; height:22px;
+    object-fit:contain;
   }
   .paytable strong{ color:var(--white); }
 
@@ -227,6 +311,105 @@
     padding:20px;
     font-size:12px;
     color:rgba(245,243,236,0.4);
+  }
+
+  /* ---------- Settings modal ---------- */
+  .modal-backdrop{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.6);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:100;
+  }
+  .modal-backdrop.open{ display:flex; }
+
+  .modal{
+    position:relative;
+    background:var(--black);
+    border:1px solid var(--gold);
+    border-radius:10px;
+    width:100%;
+    max-width:380px;
+    padding:26px;
+  }
+  .modal h2{
+    margin:0 0 4px;
+    font-size:21px;
+    color:var(--white-pure);
+  }
+  .modal .modal-sub{
+    margin:0 0 20px;
+    font-size:12.5px;
+    color:var(--grey);
+  }
+
+  .switch-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 0;
+    border-bottom:1px solid var(--grey-dark);
+  }
+  .switch-row:last-of-type{ border-bottom:none; }
+  .switch-row span.row-label{ font-size:14px; color:var(--white); }
+  .switch-row span.row-sub{ display:block; font-size:11.5px; color:var(--grey); margin-top:2px; }
+
+  .toggle{ position:relative; width:42px; height:24px; flex-shrink:0; }
+  .toggle input{ opacity:0; width:0; height:0; }
+  .toggle .slider{
+    position:absolute; inset:0;
+    background:var(--grey-dark);
+    border-radius:999px;
+    cursor:pointer;
+    transition:background .15s ease;
+  }
+  .toggle .slider::before{
+    content:'';
+    position:absolute;
+    width:18px; height:18px;
+    left:3px; top:3px;
+    background:var(--white-pure);
+    border-radius:50%;
+    transition:transform .15s ease;
+  }
+  .toggle input:checked + .slider{ background:var(--gold); }
+  .toggle input:checked + .slider::before{ transform:translateX(18px); }
+
+  .modal-actions{ display:flex; gap:10px; margin-top:18px; }
+  .modal-actions .btn{
+    flex:1;
+    border:none;
+    border-radius:6px;
+    padding:10px 16px;
+    font-family:'Inter', sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    cursor:pointer;
+  }
+  .btn-gold{ background:var(--gold); color:var(--black); }
+  .btn-gold:hover{ background:var(--gold-bright); }
+  .btn-red{ background:var(--red); color:var(--white-pure); }
+  .btn-red:hover{ background:var(--red-bright); }
+
+  .modal-msg{
+    margin-top:12px;
+    font-size:12.5px;
+    color:var(--yellow);
+    text-align:center;
+    min-height:16px;
+  }
+
+  .close-x{
+    position:absolute;
+    top:14px; right:16px;
+    background:none;
+    border:none;
+    color:var(--grey);
+    font-size:18px;
+    cursor:pointer;
   }
 </style>
 </head>
@@ -239,6 +422,7 @@
   </div>
   <div class="topbar-right">
     <div class="balance-chip"><span class="label">Chips</span><span id="balance-display">1,000</span></div>
+    <button class="icon-btn" id="settings-btn" title="Settings" aria-label="Settings">⚙</button>
     <a class="back-link" href="home.html">← Lobby</a>
   </div>
 </div>
@@ -249,9 +433,9 @@
     <p class="sub">Match three symbols to win. Cherries pay small, sevens pay big.</p>
 
     <div class="reels">
-      <div class="reel" id="reel-0">🍒</div>
-      <div class="reel" id="reel-1">🍒</div>
-      <div class="reel" id="reel-2">🍒</div>
+      <div class="reel" id="reel-0"><img class="reel-img" id="reel-img-0" src="" alt=""></div>
+      <div class="reel" id="reel-1"><img class="reel-img" id="reel-img-1" src="" alt=""></div>
+      <div class="reel" id="reel-2"><img class="reel-img" id="reel-img-2" src="" alt=""></div>
     </div>
 
     <div class="result-msg neutral" id="slots-msg">Place a bet and pull the lever.</div>
@@ -266,17 +450,65 @@
 
     <button class="primary-btn" id="spin-btn">Spin</button>
 
-    <div class="paytable">
-      <div><strong>7️⃣ 7️⃣ 7️⃣</strong> — pays 20×</div>
-      <div><strong>💎 💎 💎</strong> — pays 10×</div>
-      <div><strong>🔔 🔔 🔔</strong> — pays 6×</div>
-      <div><strong>🍋 🍋 🍋 / 🍒 🍒 🍒</strong> — pays 3×</div>
-      <div><strong>Any two matching</strong> — pays 1× (money back)</div>
+    <div class="auto-section">
+      <h3>Auto spin</h3>
+      <p class="auto-sub">Pick a number of spins and let it run. You can still change your bet between spins, and stop at any time.</p>
+
+      <div class="auto-row">
+        <label for="auto-count">Spins</label>
+        <input type="number" id="auto-count" value="10" min="1" step="1">
+      </div>
+
+      <div class="auto-actions">
+        <button class="auto-btn start" id="auto-start-btn">Start auto spin</button>
+        <button class="auto-btn stop" id="auto-stop-btn" disabled>Stop</button>
+      </div>
+
+      <div class="auto-status" id="auto-status"></div>
     </div>
+
+    <div class="paytable" id="paytable"></div>
   </section>
 </main>
 
 <footer>Play-money simulation • no real gambling, payment, or age verification involved</footer>
+
+<!-- ============ SETTINGS MODAL ============ -->
+<div class="modal-backdrop" id="settings-backdrop">
+  <div class="modal">
+    <button class="close-x" data-close="settings-backdrop">✕</button>
+    <h2>Settings</h2>
+    <p class="modal-sub">These are local to your browser only.</p>
+
+    <div class="switch-row">
+      <div>
+        <span class="row-label">Sound effects</span>
+        <span class="row-sub">Spin and card sounds</span>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="sound-toggle" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="switch-row">
+      <div>
+        <span class="row-label">Reduced motion</span>
+        <span class="row-sub">Skips the reel-spin animation</span>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="motion-toggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-red" id="reset-balance-btn">Reset chips</button>
+      <button class="btn btn-gold" data-close="settings-backdrop">Done</button>
+    </div>
+    <div class="modal-msg" id="settings-msg"></div>
+  </div>
+</div>
 
 <script>
 /* ============ Shared balance (same key as home.html / blackjack.html) ============ */
@@ -313,51 +545,82 @@ function takeBet(inputEl, msgEl){
   return bet;
 }
 
-/* ============ Slots ============ */
-const SYMBOLS = ['🍒','🍋','🔔','💎','7️⃣'];
-const PAYOUTS = { '7️⃣': 20, '💎': 10, '🔔': 6, '🍋': 3, '🍒': 3 };
+/* ============ Symbol images ============
+   Each key below is one reel symbol. To use your own artwork, put a real
+   image path or URL in its string, e.g. cherry: 'images/cherry.png'.
+   Anything left as '' is auto-filled with a placeholder graphic so the
+   reels and paytable still look right until you add real images.
+*/
+const SYMBOL_LABELS = { cherry:'Cherry', lemon:'Lemon', bell:'Bell', diamond:'Diamond', seven:'Seven' };
+const SYMBOL_SRC = {
+  cherry: '',
+  lemon: '',
+  bell: '',
+  diamond: '',
+  seven: ''
+};
+const PAYOUTS = { seven:20, diamond:10, bell:6, lemon:3, cherry:3 };
+const SYMBOLS = Object.keys(SYMBOL_SRC);
 
+function placeholderDataUri(label){
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="160" height="160">
+      <rect x="4" y="4" width="152" height="152" rx="10" fill="#1c2420" stroke="#3a423d" stroke-width="2" stroke-dasharray="6 5"/>
+      <text x="50%" y="46%" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#8b948e">image slot</text>
+      <text x="50%" y="64%" text-anchor="middle" font-family="serif" font-size="17" fill="#c9a227">${label}</text>
+    </svg>`;
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+}
+
+SYMBOLS.forEach(key => {
+  if (!SYMBOL_SRC[key]){
+    SYMBOL_SRC[key] = placeholderDataUri(SYMBOL_LABELS[key]);
+  }
+});
+
+/* Build the paytable rows from the same data, so labels/images stay in sync */
+const paytableEl = document.getElementById('paytable');
+const payRows = [
+  { keys: ['seven','seven','seven'], text: `pays ${PAYOUTS.seven}×` },
+  { keys: ['diamond','diamond','diamond'], text: `pays ${PAYOUTS.diamond}×` },
+  { keys: ['bell','bell','bell'], text: `pays ${PAYOUTS.bell}×` },
+  { keys: ['lemon','lemon','lemon'], text: `pays ${PAYOUTS.lemon}× (also cherry)` },
+  { keys: ['cherry'], text: 'any two matching — pays 1× (money back)' }
+];
+payRows.forEach(row => {
+  const div = document.createElement('div');
+  div.className = 'pay-row';
+  row.keys.forEach(k => {
+    const img = document.createElement('img');
+    img.src = SYMBOL_SRC[k];
+    img.alt = SYMBOL_LABELS[k];
+    div.appendChild(img);
+  });
+  const span = document.createElement('span');
+  span.innerHTML = row.text;
+  div.appendChild(span);
+  paytableEl.appendChild(div);
+});
+
+/* ============ Reels ============ */
 const reels = [0,1,2].map(i => document.getElementById('reel-' + i));
+const reelImgs = [0,1,2].map(i => document.getElementById('reel-img-' + i));
 const slotsMsg = document.getElementById('slots-msg');
 const slotsBetInput = document.getElementById('slots-bet');
 const spinBtn = document.getElementById('spin-btn');
 
-function randomSymbol(){
+function randomSymbolKey(){
   return SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
 }
-
-spinBtn.addEventListener('click', () => {
-  const bet = takeBet(slotsBetInput, slotsMsg);
-  if (bet === null) return;
-
-  balance -= bet;
-  renderBalance();
-  spinBtn.disabled = true;
-  slotsMsg.textContent = 'Spinning…';
-  slotsMsg.className = 'result-msg neutral';
-  reels.forEach(r => r.classList.add('spinning'));
-
-  const finalSymbols = [randomSymbol(), randomSymbol(), randomSymbol()];
-  let ticks = 0;
-  const maxTicks = 14;
-
-  const interval = setInterval(() => {
-    ticks++;
-    reels.forEach((r, i) => {
-      if (ticks < maxTicks - (2 - i) * 3){
-        r.textContent = randomSymbol();
-      } else {
-        r.textContent = finalSymbols[i];
-        r.classList.remove('spinning');
-      }
-    });
-
-    if (ticks >= maxTicks){
-      clearInterval(interval);
-      settleSlots(finalSymbols, bet);
-    }
-  }, 80);
-});
+function setReelSymbol(index, key){
+  reelImgs[index].src = SYMBOL_SRC[key];
+  reelImgs[index].alt = SYMBOL_LABELS[key];
+  reels[index].dataset.symbol = key;
+}
+// initial faces
+setReelSymbol(0, 'cherry');
+setReelSymbol(1, 'cherry');
+setReelSymbol(2, 'cherry');
 
 function settleSlots(symbols, bet){
   let winnings = 0;
@@ -370,7 +633,6 @@ function settleSlots(symbols, bet){
 
   balance += winnings;
   renderBalance();
-  spinBtn.disabled = false;
 
   if (winnings > bet){
     slotsMsg.textContent = `Winner! +${winnings.toLocaleString()} chips`;
@@ -383,6 +645,158 @@ function settleSlots(symbols, bet){
     slotsMsg.className = 'result-msg lose';
   }
 }
+
+/* Runs exactly one spin for the given bet and resolves once it has
+   fully settled (animation included). Used by both the Spin button
+   and the auto-spin loop, so behavior stays identical either way. */
+function runSingleSpin(bet){
+  return new Promise(resolve => {
+    balance -= bet;
+    renderBalance();
+    slotsMsg.textContent = 'Spinning…';
+    slotsMsg.className = 'result-msg neutral';
+
+    const finalSymbols = [randomSymbolKey(), randomSymbolKey(), randomSymbolKey()];
+
+    if (motionToggle.checked){
+      // Reduced motion: skip the cycling animation, jump straight to the result.
+      finalSymbols.forEach((key, i) => setReelSymbol(i, key));
+      settleSlots(finalSymbols, bet);
+      resolve();
+      return;
+    }
+
+    reels.forEach(r => r.classList.add('spinning'));
+    let ticks = 0;
+    const maxTicks = 14;
+
+    const interval = setInterval(() => {
+      ticks++;
+      reels.forEach((r, i) => {
+        if (ticks < maxTicks - (2 - i) * 3){
+          setReelSymbol(i, randomSymbolKey());
+        } else {
+          setReelSymbol(i, finalSymbols[i]);
+          r.classList.remove('spinning');
+        }
+      });
+
+      if (ticks >= maxTicks){
+        clearInterval(interval);
+        settleSlots(finalSymbols, bet);
+        resolve();
+      }
+    }, 80);
+  });
+}
+
+/* ---------- Manual spin ---------- */
+spinBtn.addEventListener('click', async () => {
+  const bet = takeBet(slotsBetInput, slotsMsg);
+  if (bet === null) return;
+
+  spinBtn.disabled = true;
+  autoStartBtn.disabled = true;
+  await runSingleSpin(bet);
+  spinBtn.disabled = false;
+  autoStartBtn.disabled = false;
+});
+
+/* ---------- Auto spin ----------
+   Bet is re-read from the input at the start of every single spin in
+   the loop, so changing the bet box mid-run changes the next spin —
+   nothing needs to be paused for that. */
+const autoCountInput = document.getElementById('auto-count');
+const autoStartBtn = document.getElementById('auto-start-btn');
+const autoStopBtn = document.getElementById('auto-stop-btn');
+const autoStatus = document.getElementById('auto-status');
+
+let autoRunning = false;
+let autoStopRequested = false;
+
+autoStartBtn.addEventListener('click', async () => {
+  const count = Math.floor(Number(autoCountInput.value));
+  if (!Number.isFinite(count) || count <= 0){
+    autoStatus.textContent = 'Enter a valid number of spins (1 or more).';
+    return;
+  }
+
+  autoRunning = true;
+  autoStopRequested = false;
+  autoStartBtn.disabled = true;
+  autoCountInput.disabled = true;
+  spinBtn.disabled = true;
+  autoStopBtn.disabled = false;
+  autoStatus.textContent = `Auto-spinning… 0 of ${count} complete.`;
+
+  let done = 0;
+  while (autoRunning && !autoStopRequested && done < count){
+    const bet = takeBet(slotsBetInput, slotsMsg);
+    if (bet === null){
+      autoStatus.textContent = `Auto spin stopped after ${done} of ${count} — check your bet or balance.`;
+      break;
+    }
+
+    await runSingleSpin(bet);
+    done++;
+
+    if (autoStopRequested){
+      autoStatus.textContent = `Auto spin stopped after ${done} of ${count} spins.`;
+    } else if (done >= count){
+      autoStatus.textContent = `Auto spin finished — ${count} spins complete.`;
+    } else {
+      autoStatus.textContent = `Auto-spinning… ${done} of ${count} complete.`;
+    }
+  }
+
+  autoRunning = false;
+  autoStartBtn.disabled = false;
+  autoCountInput.disabled = false;
+  spinBtn.disabled = false;
+  autoStopBtn.disabled = true;
+});
+
+autoStopBtn.addEventListener('click', () => {
+  autoStopRequested = true;
+  autoStopBtn.disabled = true;
+  autoStatus.textContent = 'Stopping after the current spin…';
+});
+
+/* ============ Settings modal ============ */
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+document.getElementById('settings-btn').addEventListener('click', () => openModal('settings-backdrop'));
+document.querySelectorAll('[data-close]').forEach(el => {
+  el.addEventListener('click', () => closeModal(el.dataset.close));
+});
+document.querySelectorAll('.modal-backdrop').forEach(bd => {
+  bd.addEventListener('click', e => { if (e.target === bd) bd.classList.remove('open'); });
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape'){
+    document.querySelectorAll('.modal-backdrop.open').forEach(bd => bd.classList.remove('open'));
+  }
+});
+
+const soundToggle = document.getElementById('sound-toggle');
+const motionToggle = document.getElementById('motion-toggle');
+soundToggle.checked = localStorage.getItem('vt-sound') !== 'off';
+motionToggle.checked = localStorage.getItem('vt-reduced-motion') === 'on';
+soundToggle.addEventListener('change', () => {
+  localStorage.setItem('vt-sound', soundToggle.checked ? 'on' : 'off');
+});
+motionToggle.addEventListener('change', () => {
+  localStorage.setItem('vt-reduced-motion', motionToggle.checked ? 'on' : 'off');
+});
+
+document.getElementById('reset-balance-btn').addEventListener('click', () => {
+  balance = 1000;
+  renderBalance();
+  const msg = document.getElementById('settings-msg');
+  msg.textContent = 'Balance reset to 1,000 chips.';
+  setTimeout(() => { msg.textContent = ''; }, 2500);
+});
 </script>
 
 </body>
