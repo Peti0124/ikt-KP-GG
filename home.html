@@ -38,7 +38,7 @@
 
   a{ color:inherit; }
 
-  /* ---------- Top bar ---------- */
+  /* fenti sáv */
   .topbar{
     position:sticky;
     top:0;
@@ -139,7 +139,7 @@
   }
   .btn-red:hover{ background:var(--red-bright); }
 
-  /* ---------- Hero ---------- */
+  /* felirat (nem igazi pénz) */
   .hero{
     max-width:1080px;
     margin:0 auto;
@@ -166,7 +166,7 @@
     line-height:1.6;
   }
 
-  /* ---------- Game grid ---------- */
+  /* Játékok */
   .grid-section{
     max-width:1080px;
     margin:0 auto;
@@ -201,9 +201,7 @@
   }
   .game-card:hover{ border-color:var(--gold); transform:translateY(-3px); }
 
-  /* This is the image slot. Swap the <img src="..."> below with your own
-     artwork (any size works — it's cropped to fill), or delete the
-     data-uri src entirely and point it at a real file / URL. */
+  /* kép nélküli tér (home) */
   .card-image-wrap{
     position:relative;
     aspect-ratio:16/10;
@@ -286,7 +284,7 @@
     border-top:1px solid rgba(201,162,39,0.15);
   }
 
-  /* ---------- Modals ---------- */
+  /* ne legyn minden az oldalon (néhaány dolog pl beállítások el vannak rejtve) */
   .modal-backdrop{
     position:fixed;
     inset:0;
@@ -422,7 +420,7 @@
 </head>
 <body>
 
-<!-- ============ TOP BAR ============ -->
+<!-- fenti sor -->
 <div class="topbar">
   <div class="brand">
     <span class="mark">♠</span>
@@ -440,25 +438,25 @@
   </div>
 </div>
 
-<!-- ============ HERO ============ -->
+<!-- Felirat -->
 <section class="hero">
   <p class="kicker">CS PROJECT — PLAY MONEY ONLY</p>
   <h1>Welcome back to the lobby</h1>
   <p>Pick a table below. Every chip on this site is simulated — there's no real money, no payment, and no payout involved.</p>
 </section>
 
-<!-- ============ GAME GRID ============ -->
+<!-- Játékok -->
 <section class="grid-section">
   <h2>Tables</h2>
   <p class="section-sub">Click a card's image to see where your own artwork drops in.</p>
 
   <div class="card-grid">
 
-    <!-- Card 1: Slots -->
+    <!-- Slots -->
     <article class="game-card">
       <div class="card-image-wrap">
         <span class="badge popular">Popular</span>
-        <img src="" alt="Golden Reels slot machine" data-placeholder-label="Golden Reels" class="game-image">
+        <img src="slots.jpg" alt="Golden Reels slot machine" data-placeholder-label="Golden Reels" class="game-image">
       </div>
       <div class="card-body">
         <h3>Golden Reels</h3>
@@ -470,11 +468,11 @@
       </div>
     </article>
 
-    <!-- Card 2: Blackjack -->
+    <!-- 21 -->
     <article class="game-card">
       <div class="card-image-wrap">
         <span class="badge new">New</span>
-        <img src="" alt="Twenty-One blackjack table" data-placeholder-label="Twenty-One" class="game-image">
+        <img src="bj.png" alt="Twenty-One blackjack table" data-placeholder-label="Twenty-One" class="game-image">
       </div>
       <div class="card-body">
         <h3>Twenty-One</h3>
@@ -486,7 +484,7 @@
       </div>
     </article>
 
-    <!-- Card 3: Roulette (placeholder game) -->
+    <!-- rulett -->
     <article class="game-card">
       <div class="card-image-wrap">
         <span class="badge soon">Coming soon</span>
@@ -502,7 +500,7 @@
       </div>
     </article>
 
-    <!-- Card 4: Poker (placeholder game) -->
+    <!-- Póker -->
     <article class="game-card">
       <div class="card-image-wrap">
         <span class="badge soon">Coming soon</span>
@@ -523,7 +521,7 @@
 
 <footer>Play-money simulation • no real gambling, payment, or age verification involved</footer>
 
-<!-- ============ SETTINGS MODAL ============ -->
+<!-- Beállítások gui -->
 <div class="modal-backdrop" id="settings-backdrop">
   <div class="modal">
     <button class="close-x" data-close="settings-backdrop">✕</button>
@@ -560,7 +558,7 @@
   </div>
 </div>
 
-<!-- ============ LOG IN MODAL ============ -->
+<!-- Bejelentkezés -->
 <div class="modal-backdrop" id="login-backdrop">
   <div class="modal">
     <button class="close-x" data-close="login-backdrop">✕</button>
@@ -585,7 +583,7 @@
   </div>
 </div>
 
-<!-- ============ SIGN UP MODAL ============ -->
+<!-- Regisztráció -->
 <div class="modal-backdrop" id="signup-backdrop">
   <div class="modal">
     <button class="close-x" data-close="signup-backdrop">✕</button>
@@ -615,7 +613,7 @@
 </div>
 
 <script>
-/* ============ Balance (shared with casino.html via localStorage) ============ */
+/* egyenleg */
 const STORAGE_KEY = 'velvet-table-balance';
 let balance = Number(localStorage.getItem(STORAGE_KEY));
 if (!Number.isFinite(balance) || balance <= 0) balance = 1000;
@@ -653,7 +651,7 @@ document.querySelectorAll('.game-image').forEach(img => {
   }
 });
 
-/* ============ Play buttons ============ */
+/* play gomb (home) */
 document.querySelectorAll('.play-btn[data-href]').forEach(btn => {
   btn.addEventListener('click', () => {
     window.location.href = btn.dataset.href;
@@ -676,7 +674,7 @@ document.addEventListener('keydown', e => {
   }
 });
 
-/* ============ Settings ============ */
+/* beállytások működése */
 document.getElementById('settings-btn').addEventListener('click', () => openModal('settings-backdrop'));
 
 document.getElementById('reset-balance-btn').addEventListener('click', () => {
@@ -687,8 +685,7 @@ document.getElementById('reset-balance-btn').addEventListener('click', () => {
   setTimeout(() => { msg.textContent = ''; }, 2500);
 });
 
-/* Sound / reduced-motion toggles are stored so casino.html could read
-   them too, but no audio is wired up yet in this prototype. */
+/* hang ki-be (idk hogy van-e sulis gépen nincs :(  )) */
 const soundToggle = document.getElementById('sound-toggle');
 const motionToggle = document.getElementById('motion-toggle');
 soundToggle.checked = localStorage.getItem('vt-sound') !== 'off';
@@ -700,7 +697,7 @@ motionToggle.addEventListener('change', () => {
   localStorage.setItem('vt-reduced-motion', motionToggle.checked ? 'on' : 'off');
 });
 
-/* ============ Log in / Sign up ============ */
+/* Bejelentkezés és regisztráció működése */
 document.getElementById('login-open-btn').addEventListener('click', () => openModal('login-backdrop'));
 document.getElementById('signup-open-btn').addEventListener('click', () => openModal('signup-backdrop'));
 
