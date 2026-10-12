@@ -1,5 +1,12 @@
+make ma a roulette game. Place somewhere a bonuspack. It should look like this: a roulette table on the top of the page, and the reel below it. In the reel a ball is always spining and the reel it self spins in the other way. You can palce bets with 10 20 50 100 1000 and 10000 chips. When u placed ur bet you press a button and the spin happens. When its over you can press a button next to the table which makes your prevous bet.
+
+
+
+
+
+
 <!DOCTYPE html>
-<html lang="hu">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,7 +45,7 @@
 
   a{ color:inherit; }
 
-  /* fenti sáv */
+  /* ---------- Top bar ---------- */
   .topbar{
     position:sticky;
     top:0;
@@ -139,7 +146,7 @@
   }
   .btn-red:hover{ background:var(--red-bright); }
 
-  /* felirat (nem igazi pénz) */
+  /* ---------- Hero ---------- */
   .hero{
     max-width:1080px;
     margin:0 auto;
@@ -166,7 +173,7 @@
     line-height:1.6;
   }
 
-  /* Játékok */
+  /* ---------- Game grid ---------- */
   .grid-section{
     max-width:1080px;
     margin:0 auto;
@@ -201,7 +208,9 @@
   }
   .game-card:hover{ border-color:var(--gold); transform:translateY(-3px); }
 
-  /* kép nélküli tér (home) */
+  /* This is the image slot. Swap the <img src="..."> below with your own
+     artwork (any size works — it's cropped to fill), or delete the
+     data-uri src entirely and point it at a real file / URL. */
   .card-image-wrap{
     position:relative;
     aspect-ratio:16/10;
@@ -284,7 +293,7 @@
     border-top:1px solid rgba(201,162,39,0.15);
   }
 
-  /* ne legyn minden az oldalon (néhaány dolog pl beállítások el vannak rejtve) */
+  /* ---------- Modals ---------- */
   .modal-backdrop{
     position:fixed;
     inset:0;
@@ -416,11 +425,33 @@
     cursor:pointer;
   }
   .modal{ position:relative; }
+
+  /* ---------- Hidden bonus pack toast ---------- */
+  .bonus-toast{
+    position:fixed;
+    left:50%;
+    bottom:28px;
+    transform:translate(-50%, 30px);
+    opacity:0;
+    pointer-events:none;
+    background:var(--black);
+    border:1px solid var(--gold);
+    color:var(--gold-bright);
+    padding:12px 22px;
+    border-radius:999px;
+    font-size:14px;
+    font-weight:600;
+    text-align:center;
+    z-index:200;
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  .bonus-toast.show{ opacity:1; transform:translate(-50%, 0); }
+  #secret-bullet{ display:inline-block; padding:8px 4px; margin:-8px -4px; }
 </style>
 </head>
 <body>
 
-<!-- fenti sor -->
+<!-- ============ TOP BAR ============ -->
 <div class="topbar">
   <div class="brand">
     <span class="mark">♠</span>
@@ -438,25 +469,25 @@
   </div>
 </div>
 
-<!-- Felirat -->
+<!-- ============ HERO ============ -->
 <section class="hero">
   <p class="kicker">CS PROJECT — PLAY MONEY ONLY</p>
   <h1>Welcome back to the lobby</h1>
   <p>Pick a table below. Every chip on this site is simulated — there's no real money, no payment, and no payout involved.</p>
 </section>
 
-<!-- Játékok -->
+<!-- ============ GAME GRID ============ -->
 <section class="grid-section">
   <h2>Tables</h2>
   <p class="section-sub">Click a card's image to see where your own artwork drops in.</p>
 
   <div class="card-grid">
 
-    <!-- Slots -->
+    <!-- Card 1: Slots -->
     <article class="game-card">
       <div class="card-image-wrap">
         <span class="badge popular">Popular</span>
-        <img src="slots.jpg" alt="Golden Reels slot machine" data-placeholder-label="Golden Reels" class="game-image">
+        <img src="" alt="Golden Reels slot machine" data-placeholder-label="Golden Reels" class="game-image">
       </div>
       <div class="card-body">
         <h3>Golden Reels</h3>
@@ -468,11 +499,11 @@
       </div>
     </article>
 
-    <!-- 21 -->
+    <!-- Card 2: Blackjack -->
     <article class="game-card">
       <div class="card-image-wrap">
         <span class="badge new">New</span>
-        <img src="bj.png" alt="Twenty-One blackjack table" data-placeholder-label="Twenty-One" class="game-image">
+        <img src="" alt="Twenty-One blackjack table" data-placeholder-label="Twenty-One" class="game-image">
       </div>
       <div class="card-body">
         <h3>Twenty-One</h3>
@@ -484,7 +515,7 @@
       </div>
     </article>
 
-    <!-- rulett -->
+    <!-- Card 3: Roulette (placeholder game) -->
     <article class="game-card">
       <div class="card-image-wrap">
         <span class="badge soon">Coming soon</span>
@@ -500,7 +531,7 @@
       </div>
     </article>
 
-    <!-- Póker -->
+    <!-- Card 4: Poker (placeholder game) -->
     <article class="game-card">
       <div class="card-image-wrap">
         <span class="badge soon">Coming soon</span>
@@ -519,9 +550,9 @@
   </div>
 </section>
 
-<footer>Play-money simulation • no real gambling, payment, or age verification involved</footer>
+<footer>Play-money simulation <span id="secret-bullet">•</span> no real gambling, payment, or age verification involved</footer>
 
-<!-- Beállítások gui -->
+<!-- ============ SETTINGS MODAL ============ -->
 <div class="modal-backdrop" id="settings-backdrop">
   <div class="modal">
     <button class="close-x" data-close="settings-backdrop">✕</button>
@@ -558,7 +589,7 @@
   </div>
 </div>
 
-<!-- Bejelentkezés -->
+<!-- ============ LOG IN MODAL ============ -->
 <div class="modal-backdrop" id="login-backdrop">
   <div class="modal">
     <button class="close-x" data-close="login-backdrop">✕</button>
@@ -583,7 +614,7 @@
   </div>
 </div>
 
-<!-- Regisztráció -->
+<!-- ============ SIGN UP MODAL ============ -->
 <div class="modal-backdrop" id="signup-backdrop">
   <div class="modal">
     <button class="close-x" data-close="signup-backdrop">✕</button>
@@ -613,7 +644,7 @@
 </div>
 
 <script>
-/* egyenleg */
+/* ============ Balance (shared with casino.html via localStorage) ============ */
 const STORAGE_KEY = 'velvet-table-balance';
 let balance = Number(localStorage.getItem(STORAGE_KEY));
 if (!Number.isFinite(balance) || balance <= 0) balance = 1000;
@@ -651,7 +682,7 @@ document.querySelectorAll('.game-image').forEach(img => {
   }
 });
 
-/* play gomb (home) */
+/* ============ Play buttons ============ */
 document.querySelectorAll('.play-btn[data-href]').forEach(btn => {
   btn.addEventListener('click', () => {
     window.location.href = btn.dataset.href;
@@ -674,7 +705,7 @@ document.addEventListener('keydown', e => {
   }
 });
 
-/* beállytások működése */
+/* ============ Settings ============ */
 document.getElementById('settings-btn').addEventListener('click', () => openModal('settings-backdrop'));
 
 document.getElementById('reset-balance-btn').addEventListener('click', () => {
@@ -685,7 +716,8 @@ document.getElementById('reset-balance-btn').addEventListener('click', () => {
   setTimeout(() => { msg.textContent = ''; }, 2500);
 });
 
-/* hang ki-be (idk hogy van-e sulis gépen nincs :(  )) */
+/* Sound / reduced-motion toggles are stored so casino.html could read
+   them too, but no audio is wired up yet in this prototype. */
 const soundToggle = document.getElementById('sound-toggle');
 const motionToggle = document.getElementById('motion-toggle');
 soundToggle.checked = localStorage.getItem('vt-sound') !== 'off';
@@ -697,7 +729,7 @@ motionToggle.addEventListener('change', () => {
   localStorage.setItem('vt-reduced-motion', motionToggle.checked ? 'on' : 'off');
 });
 
-/* Bejelentkezés és regisztráció működése */
+/* ============ Log in / Sign up ============ */
 document.getElementById('login-open-btn').addEventListener('click', () => openModal('login-backdrop'));
 document.getElementById('signup-open-btn').addEventListener('click', () => openModal('signup-backdrop'));
 
@@ -723,6 +755,53 @@ document.getElementById('signup-form').addEventListener('submit', e => {
   document.getElementById('signup-msg').textContent =
     `This is a demo — no account for "${name}" was actually created or stored.`;
 });
+
+/* ============ Hidden bonus pack ============
+   One per page, each worth a different amount. Found state is saved in
+   localStorage so every pack can only be claimed once. To reset them
+   for testing, run this in the browser console:
+     localStorage.removeItem('velvet-bonus-found')
+*/
+const BONUS_KEY = 'velvet-bonus-found';
+const BONUS_PAGE = 'home';
+const BONUS_AMOUNT = 200;
+const BONUS_TOTAL_PAGES = 3;
+
+function readBonusFound(){
+  try { return JSON.parse(localStorage.getItem(BONUS_KEY)) || {}; }
+  catch (e){ return {}; }
+}
+
+function showBonusToast(text){
+  let toast = document.getElementById('bonus-toast');
+  if (!toast){
+    toast = document.createElement('div');
+    toast.id = 'bonus-toast';
+    toast.className = 'bonus-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = text;
+  toast.classList.add('show');
+  clearTimeout(showBonusToast.timer);
+  showBonusToast.timer = setTimeout(() => toast.classList.remove('show'), 4000);
+}
+
+function claimBonus(){
+  const found = readBonusFound();
+  if (found[BONUS_PAGE]) return;   // already claimed on this page
+  found[BONUS_PAGE] = true;
+  localStorage.setItem(BONUS_KEY, JSON.stringify(found));
+
+  balance += BONUS_AMOUNT;
+  renderBalance();
+
+  const count = Object.keys(found).length;
+  showBonusToast(count >= BONUS_TOTAL_PAGES
+    ? `★ Bonus pack found! +${BONUS_AMOUNT} chips — that's all of them!`
+    : `★ Bonus pack found! +${BONUS_AMOUNT} chips (${count} of ${BONUS_TOTAL_PAGES})`);
+}
+
+document.getElementById('secret-bullet').addEventListener('click', claimBonus);
 </script>
 
 </body>

@@ -274,6 +274,27 @@
     font-size:12px;
     color:rgba(245,243,236,0.4);
   }
+
+  /* ---------- Hidden bonus pack toast ---------- */
+  .bonus-toast{
+    position:fixed;
+    left:50%;
+    bottom:28px;
+    transform:translate(-50%, 30px);
+    opacity:0;
+    pointer-events:none;
+    background:var(--black);
+    border:1px solid var(--gold);
+    color:var(--gold-bright);
+    padding:12px 22px;
+    border-radius:999px;
+    font-size:14px;
+    font-weight:600;
+    text-align:center;
+    z-index:200;
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  .bonus-toast.show{ opacity:1; transform:translate(-50%, 0); }
 </style>
 </head>
 <body>
@@ -433,6 +454,7 @@ function renderTable(hideDealerHole){
     if (hideDealerHole && i === 1){
       const back = document.createElement('div');
       back.className = 'card back';
+      back.addEventListener('click', claimBonus);
       dealerCardsEl.appendChild(back);
     } else {
       dealerCardsEl.appendChild(renderCard(card));
@@ -659,6 +681,51 @@ function finishRound(){
 
 // initial empty state
 dealerTotalEl.textContent = '';
+
+/* ============ Hidden bonus pack ============
+   One per page, each worth a different amount. Found state is saved in
+   localStorage so every pack can only be claimed once. To reset them
+   for testing, run this in the browser console:
+     localStorage.removeItem('velvet-bonus-found')
+*/
+const BONUS_KEY = 'velvet-bonus-found';
+const BONUS_PAGE = 'blackjack';
+const BONUS_AMOUNT = 300;
+const BONUS_TOTAL_PAGES = 3;
+
+function readBonusFound(){
+  try { return JSON.parse(localStorage.getItem(BONUS_KEY)) || {}; }
+  catch (e){ return {}; }
+}
+
+function showBonusToast(text){
+  let toast = document.getElementById('bonus-toast');
+  if (!toast){
+    toast = document.createElement('div');
+    toast.id = 'bonus-toast';
+    toast.className = 'bonus-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = text;
+  toast.classList.add('show');
+  clearTimeout(showBonusToast.timer);
+  showBonusToast.timer = setTimeout(() => toast.classList.remove('show'), 4000);
+}
+
+function claimBonus(){
+  const found = readBonusFound();
+  if (found[BONUS_PAGE]) return;   // already claimed on this page
+  found[BONUS_PAGE] = true;
+  localStorage.setItem(BONUS_KEY, JSON.stringify(found));
+
+  balance += BONUS_AMOUNT;
+  renderBalance();
+
+  const count = Object.keys(found).length;
+  showBonusToast(count >= BONUS_TOTAL_PAGES
+    ? `★ Bonus pack found! +${BONUS_AMOUNT} chips — that's all of them!`
+    : `★ Bonus pack found! +${BONUS_AMOUNT} chips (${count} of ${BONUS_TOTAL_PAGES})`);
+}
 </script>
 
 </body>
