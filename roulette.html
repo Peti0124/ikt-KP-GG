@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roulette</title>
+<style>
+:root{--green:#0f5a38;--felt:#0a3d27;--gold:#d4af37;--red:#b3202a;--black:#101010;--grey:#8a8a8a;--white:#f4f4f0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,#0b3d28 0,#04180f 70%) fixed;color:var(--white);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.serif{font-family:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 22px;border-bottom:1px solid rgba(212,175,55,.35)}
+header h1{margin:0;font-size:1.5rem;font-weight:600;color:var(--gold);letter-spacing:.02em}
+header a{color:var(--white);text-decoration:none;border:1px solid var(--grey);padding:6px 12px;border-radius:6px;font-size:.9rem}
+header a:hover{border-color:var(--gold);color:var(--gold)}
+main{max-width:1060px;margin:0 auto;padding:18px 16px 60px}
+.bar{display:flex;flex-wrap:wrap;gap:10px 28px;align-items:baseline;margin-bottom:12px}
+.stat{font-size:.95rem;color:#cfd8d2}
+.stat b{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:1.5rem;color:var(--gold);margin-left:6px}
+#msg{min-height:1.5em;margin:0 0 12px;font-size:1.05rem}
+#msg.win{color:#7be3a0}#msg.lose{color:#e8b0b0}
+.tablewrap{display:flex;gap:16px;align-items:stretch;flex-wrap:wrap}
+.scroll{flex:1 1 640px;overflow-x:auto;padding:12px;background:var(--felt);border:3px solid var(--gold);border-radius:14px}
+#table{display:grid;grid-template-columns:1.1fr repeat(12,1fr) 1.1fr;grid-template-rows:repeat(3,52px) 40px 40px;gap:3px;min-width:640px}
+.cell{position:relative;display:flex;align-items:center;justify-content:center;border:1px solid rgba(212,175,55,.7);background:var(--green);color:var(--white);font:600 1rem "Palatino Linotype",Palatino,Georgia,serif;cursor:pointer;user-select:none;border-radius:3px;padding:0}
+.cell:hover{filter:brightness(1.35)}
+.cell.red{background:var(--red)}.cell.black{background:var(--black)}.cell.zero{background:#137a45}
+.cell.out{font-size:.85rem;font-weight:500}
+.cell:disabled{cursor:not-allowed;filter:none}
+.stake{position:absolute;right:2px;top:2px;min-width:26px;height:26px;padding:0 5px;border-radius:13px;background:var(--gold);color:#111;font:700 .72rem system-ui,sans-serif;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px #000a;pointer-events:none}
+.side{flex:0 0 190px;display:flex;flex-direction:column;gap:10px;justify-content:center}
+button.act{font:600 .95rem system-ui,sans-serif;padding:12px 14px;border-radius:8px;border:1px solid var(--gold);background:transparent;color:var(--gold);cursor:pointer}
+button.act:hover:not(:disabled){background:var(--gold);color:#111}
+button.act:disabled{opacity:.35;cursor:not-allowed}
+button.act.primary{background:var(--gold);color:#111}
+button.act.primary:hover:not(:disabled){background:#f0cb55}
+.controls{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between;margin:18px 0 6px}
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chip{width:58px;height:58px;border-radius:50%;border:4px dashed rgba(255,255,255,.85);outline:3px solid transparent;font:700 .95rem system-ui,sans-serif;cursor:pointer;box-shadow:0 3px 6px #0009;transition:transform .12s}
+.chip:hover{transform:translateY(-2px)}
+.chip.sel{outline-color:var(--gold);transform:translateY(-6px)}
+.chip[data-v="10"]{background:#ececec;color:#111;border-color:#555}
+.chip[data-v="20"]{background:var(--red);color:#fff}
+.chip[data-v="50"]{background:#2e8b57;color:#fff}
+.chip[data-v="100"]{background:#111;color:var(--gold);border-color:var(--gold)}
+.chip[data-v="1000"]{background:var(--gold);color:#111;border-color:#6b5513}
+.chip[data-v="10000"]{background:#6f6f6f;color:#fff}
+.chip:disabled{opacity:.5;cursor:not-allowed}
+#spin{min-width:160px;font-size:1.15rem;padding:14px 26px}
+.wheelwrap{display:flex;flex-direction:column;align-items:center;margin-top:26px;gap:12px}
+canvas{width:min(100%,520px);height:auto;aspect-ratio:1}
+#result{display:none;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;border:3px solid var(--gold);font:700 1.6rem "Palatino Linotype",Palatino,Georgia,serif}
+#history{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;min-height:30px}
+#history span{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:600 .8rem system-ui,sans-serif;border:1px solid rgba(212,175,55,.7)}
+.r{background:var(--red)}.b{background:var(--black)}.g{background:#137a45}
+#bonus{position:fixed;left:8px;bottom:8px;width:26px;height:26px;border:0;border-radius:50%;background:transparent;color:var(--gold);font-size:15px;cursor:pointer;opacity:.1;transition:opacity .3s}
+#bonus:hover,#bonus:focus-visible{opacity:.9}
+#refill{display:none;margin-top:8px}
+@media(max-width:700px){.side{flex:1 1 100%;flex-direction:row;flex-wrap:wrap}.side .act{flex:1}}
+</style>
+</head>
+<body>
+<header>
+  <h1 class="serif">Velvet Table &middot; Roulette</h1>
+  <a href="home.html">Back to lobby</a>
+</header>
+
+<main>
+  <div class="bar">
+    <span class="stat">Chips<b id="balance">0</b></span>
+    <span class="stat">Current bet<b id="total">0</b></span>
+  </div>
+  <p id="msg" aria-live="polite">Pick a chip, click the table to bet, then press Spin.</p>
+  <button class="act" id="refill">Get 1,000 free play chips</button>
+
+  <section class="tablewrap">
+    <div class="scroll"><div id="table"></div></div>
+    <div class="side">
+      <button class="act primary" id="repeat" disabled>Repeat last bet</button>
+      <button class="act" id="undo" disabled>Undo last chip</button>
+      <button class="act" id="clear" disabled>Clear bets</button>
+    </div>
+  </section>
+
+  <section class="controls">
+    <div class="chips" id="chips"></div>
+    <button class="act primary" id="spin">Spin</button>
+  </section>
+
+  <section class="wheelwrap">
+    <canvas id="wheel" width="520" height="520" aria-label="Roulette wheel"></canvas>
+    <div id="result"></div>
+    <div id="history" aria-label="Previous numbers"></div>
+  </section>
+</main>
+
+<button id="bonus" aria-label="Bonus pack" title="">&#9733;</button>
+
+<script>
+(function(){
+"use strict";
+var ORDER=[0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+var REDS=[1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+var CHIPS=[10,20,50,100,1000,10000];
+var STEP=Math.PI*2/37, TWO=Math.PI*2;
+var KEY="casinoChips", BONUS_KEY="rouletteBonus", BONUS_AMOUNT=5000;
+
+function col(n){return n===0?"g":(REDS.indexOf(n)>-1?"r":"b");}
+function load(k,d){try{var v=localStorage.getItem(k);return v===null?d:v;}catch(e){return d;}}
+function save(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function fmt(n){return n.toLocaleString("en-US");}
+function short(n){return n>=10000?(n/1000)+"k":(n>=1000?(n/1000)+"k":""+n);}
+
+var balance=parseInt(load(KEY,"1000"),10); if(isNaN(balance)) balance=1000;
+var chip=10, bets={}, stack=[], lastBets=null, spinning=false;
+
+var $=function(id){return document.getElementById(id);};
+var msg=$("msg");
+function say(t,cls){msg.textContent=t;msg.className=cls||"";}
+
+/* ---------- table ---------- */
+var tableEl=$("table"), cells={};
+function addCell(key,label,cls,r,c,rs,cs){
+  var b=document.createElement("button");
+  b.className="cell "+(cls||"");b.type="button";b.textContent=label;
+  b.style.gridRow=r+(rs?" / span "+rs:"");b.style.gridColumn=c+(cs?" / span "+cs:"");
+  b.addEventListener("click",function(){place(key);});
+  tableEl.appendChild(b);cells[key]=b;
+}
+addCell("n0","0","zero",1,1,3,1);
+for(var n=1;n<=36;n++){
+  addCell("n"+n,n,col(n)==="r"?"red":"black",3-((n-1)%3),2+Math.floor((n-1)/3),1,1);
+}
+addCell("c3","2 to 1","out",1,14,1,1);
+addCell("c2","2 to 1","out",2,14,1,1);
+addCell("c1","2 to 1","out",3,14,1,1);
+addCell("d1","1st 12","out",4,2,1,4);
+addCell("d2","2nd 12","out",4,6,1,4);
+addCell("d3","3rd 12","out",4,10,1,4);
+addCell("low","1 to 18","out",5,2,1,2);
+addCell("even","Even","out",5,4,1,2);
+addCell("red","Red","out red",5,6,1,2);
+addCell("black","Black","out black",5,8,1,2);
+addCell("odd","Odd","out",5,10,1,2);
+addCell("high","19 to 36","out",5,12,1,2);
+
+/* ---------- chips ---------- */
+var chipsEl=$("chips");
+CHIPS.forEach(function(v){
+  var b=document.createElement("button");
+  b.className="chip"+(v===chip?" sel":"");b.type="button";b.dataset.v=v;b.textContent=fmt(v);
+  b.addEventListener("click",function(){
+    chip=v;[].forEach.call(chipsEl.children,function(x){x.classList.toggle("sel",x===b);});
+  });
+  chipsEl.appendChild(b);
+});
+
+/* ---------- betting ---------- */
+function totalBet(){var t=0;for(var k in bets)t+=bets[k];return t;}
+function refresh(){
+  $("balance").textContent=fmt(balance);
+  $("total").textContent=fmt(totalBet());
+  for(var k in cells){
+    var old=cells[k].querySelector(".stake");if(old)old.remove();
+    if(bets[k]){var s=document.createElement("span");s.className="stake";s.textContent=short(bets[k]);cells[k].appendChild(s);}
+    cells[k].disabled=spinning;
+  }
+  $("spin").disabled=spinning;
+  $("undo").disabled=spinning||!stack.length;
+  $("clear").disabled=spinning||!stack.length;
+  $("repeat").disabled=spinning||!lastBets;
+  [].forEach.call(chipsEl.children,function(x){x.disabled=spinning;});
+  $("refill").style.display=(balance<10&&!stack.length&&!spinning)?"inline-block":"none";
+  save(KEY,balance);
+}
+function place(key){
+  if(spinning)return;
+  if(balance<chip){say("Not enough chips for a "+fmt(chip)+" chip.","lose");return;}
+  balance-=chip;bets[key]=(bets[key]||0)+chip;stack.push([key,chip]);
+  say("Bet placed. Press Spin when you are ready.");refresh();
+}
+$("undo").addEventListener("click",function(){
+  var last=stack.pop();if(!last)return;
+  balance+=last[1];bets[last[0]]-=last[1];if(!bets[last[0]])delete bets[last[0]];refresh();
+});
+$("clear").addEventListener("click",function(){
+  stack.forEach(function(s){balance+=s[1];});bets={};stack=[];say("Bets cleared.");refresh();
+});
+$("repeat").addEventListener("click",function(){
+  if(!lastBets||spinning)return;
+  var sum=0;for(var k in lastBets)sum+=lastBets[k];
+  if(sum>balance){say("Not enough chips to repeat your last bet ("+fmt(sum)+").","lose");return;}
+  for(var k2 in lastBets){bets[k2]=(bets[k2]||0)+lastBets[k2];stack.push([k2,lastBets[k2]]);}
+  balance-=sum;say("Previous bet placed again.");refresh();
+});
+$("refill").addEventListener("click",function(){balance+=1000;say("1,000 free play chips added.");refresh();});
+
+function multiplier(key,n){
+  if(key.charAt(0)==="n")return (+key.slice(1)===n)?35:-1;
+  var w=false,m=1;
+  switch(key){
+    case"red":w=col(n)==="r";break;
+    case"black":w=col(n)==="b";break;
+    case"even":w=n>0&&n%2===0;break;
+    case"odd":w=n%2===1;break;
+    case"low":w=n>=1&&n<=18;break;
+    case"high":w=n>=19;break;
+    case"d1":w=n>=1&&n<=12;m=2;break;
+    case"d2":w=n>=13&&n<=24;m=2;break;
+    case"d3":w=n>=25;m=2;break;
+    case"c1":w=n>0&&n%3===1;m=2;break;
+    case"c2":w=n>0&&n%3===2;m=2;break;
+    case"c3":w=n>0&&n%3===0;m=2;break;
+  }
+  return w?m:-1;
+}
+
+/* ---------- wheel ---------- */
+var cv=$("wheel"),ctx=cv.getContext("2d"),S=520,C=S/2,dpr=Math.min(window.devicePixelRatio||1,2);
+cv.width=S*dpr;cv.height=S*dpr;
+var wa=0, rel=-Math.PI/2, rad=183, state="idle", t0=0, T=7000, r0=0, delta=0, target=0, winNum=0, settledUntil=0;
+var COLORS={r:"#b3202a",b:"#101010",g:"#137a45"};
+
+function draw(){
+  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,S,S);ctx.translate(C,C);
+  var g=ctx.createRadialGradient(0,0,200,0,0,252);g.addColorStop(0,"#4a2e14");g.addColorStop(1,"#1a0f06");
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,252,0,TWO);ctx.fill();
+  ctx.strokeStyle="#d4af37";ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,250,0,TWO);ctx.stroke();
+  ctx.fillStyle="#0b1f16";ctx.beginPath();ctx.arc(0,0,232,0,TWO);ctx.fill();
+  ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,188,0,TWO);ctx.stroke();
+  ctx.save();ctx.rotate(wa);
+  for(var i=0;i<37;i++){
+    var n=ORDER[i],a=-Math.PI/2+i*STEP;
+    ctx.beginPath();ctx.arc(0,0,184,a-STEP/2,a+STEP/2);ctx.arc(0,0,120,a+STEP/2,a-STEP/2,true);ctx.closePath();
+    ctx.fillStyle=COLORS[col(n)];ctx.fill();ctx.strokeStyle="#d4af37";ctx.lineWidth=1;ctx.stroke();
+    ctx.save();ctx.rotate(a+Math.PI/2);ctx.fillStyle="#fff";ctx.font="bold 14px Georgia,serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(n,0,-166);ctx.restore();
+  }
+  var cg=ctx.createRadialGradient(0,0,10,0,0,120);cg.addColorStop(0,"#f0cb55");cg.addColorStop(.6,"#8a6d1c");cg.addColorStop(1,"#2a1d06");
+  ctx.fillStyle=cg;ctx.beginPath();ctx.arc(0,0,120,0,TWO);ctx.fill();
+  ctx.fillStyle="#101010";ctx.beginPath();ctx.arc(0,0,60,0,TWO);ctx.fill();
+  ctx.strokeStyle="#d4af37";ctx.lineWidth=6;ctx.lineCap="round";
+  for(var k=0;k<4;k++){var s=k*Math.PI/2;ctx.beginPath();ctx.moveTo(Math.cos(s)*14,Math.sin(s)*14);ctx.lineTo(Math.cos(s)*58,Math.sin(s)*58);ctx.stroke();}
+  ctx.fillStyle="#d4af37";ctx.beginPath();ctx.arc(0,0,14,0,TWO);ctx.fill();
+  ctx.restore();
+  var ba=wa+rel,bx=Math.cos(ba)*rad,by=Math.sin(ba)*rad;
+  ctx.fillStyle="rgba(0,0,0,.45)";ctx.beginPath();ctx.arc(bx+2,by+3,8,0,TWO);ctx.fill();
+  var bg=ctx.createRadialGradient(bx-3,by-3,1,bx,by,9);bg.addColorStop(0,"#fff");bg.addColorStop(1,"#bdbdbd");
+  ctx.fillStyle=bg;ctx.beginPath();ctx.arc(bx,by,8,0,TWO);ctx.fill();
+}
+
+function spinNow(){
+  if(spinning)return;
+  var tb=totalBet();
+  if(!tb){say("Place a bet first.","lose");return;}
+  spinning=true;lastBets=JSON.parse(JSON.stringify(bets));
+  winNum=Math.floor(Math.random()*37);
+  var idx=ORDER.indexOf(winNum);
+  target=-Math.PI/2+idx*STEP;r0=rel;
+  var diff=(((r0-target)%TWO)+TWO)%TWO;
+  delta=-(diff+TWO*6);
+  t0=performance.now();state="spin";
+  $("result").style.display="none";
+  say("No more bets. The ball is rolling...");refresh();
+}
+$("spin").addEventListener("click",spinNow);
+
+function finish(){
+  var payout=0;
+  for(var k in bets){var m=multiplier(k,winNum);if(m>0)payout+=bets[k]*(m+1);}
+  var staked=totalBet(),net=payout-staked;
+  balance+=payout;bets={};stack=[];spinning=false;
+  var r=$("result");r.style.display="flex";r.textContent=winNum;r.style.background=COLORS[col(winNum)];
+  var h=document.createElement("span");h.className=col(winNum);h.textContent=winNum;
+  $("history").insertBefore(h,$("history").firstChild);
+  while($("history").children.length>12)$("history").lastChild.remove();
+  var name=col(winNum)==="g"?"green":(col(winNum)==="r"?"red":"black");
+  if(payout>0)say(winNum+" "+name+". You won "+fmt(payout)+" chips"+(net>0?" (profit "+fmt(net)+").":"."),"win");
+  else say(winNum+" "+name+". No win this time.","lose");
+  state="settled";settledUntil=performance.now()+3500;refresh();
+}
+
+var last=performance.now();
+function frame(now){
+  var dt=Math.min(.05,(now-last)/1000);last=now;
+  wa+=(state==="spin"?0.8:0.45)*dt;
+  if(state==="idle"){
+    rel-=2.4*dt;rad+=(183-rad)*Math.min(1,dt*4);
+  }else if(state==="spin"){
+    var t=Math.min(1,(now-t0)/T),e=1-Math.pow(1-t,3);
+    rel=r0+delta*e;
+    if(t<.7)rad=183;
+    else{
+      var u=(t-.7)/.3,sm=u*u*(3-2*u);
+      rad=183+(152-183)*sm+Math.sin(u*Math.PI*3)*6*(1-u);
+    }
+    if(t>=1){rel=r0+delta;rad=152;finish();}
+  }else if(now>settledUntil){state="idle";}
+  draw();requestAnimationFrame(frame);
+}
+
+/* ---------- hidden bonus pack ---------- */
+$("bonus").addEventListener("click",function(){
+  if(load(BONUS_KEY,"")==="1"){say("You already found this bonus pack.");return;}
+  save(BONUS_KEY,"1");balance+=BONUS_AMOUNT;
+  say("You found the hidden bonus pack! +"+fmt(BONUS_AMOUNT)+" chips.","win");refresh();
+});
+
+refresh();requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
