@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hu">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -201,9 +201,6 @@
   }
   .game-card:hover{ border-color:var(--gold); transform:translateY(-3px); }
 
-  /* This is the image slot. Swap the <img src="..."> below with your own
-     artwork (any size works — it's cropped to fill), or delete the
-     data-uri src entirely and point it at a real file / URL. */
   .card-image-wrap{
     position:relative;
     aspect-ratio:16/10;
@@ -469,18 +466,18 @@
   <p>Pick a table below. Every chip on this site is simulated — there's no real money, no payment, and no payout involved.</p>
 </section>
 
-<!-- ============ GAME GRID ============ -->
+<!--  Játékok -->
 <section class="grid-section">
   <h2>Tables</h2>
   <p class="section-sub">Click a card's image to see where your own artwork drops in.</p>
 
   <div class="card-grid">
 
-    <!-- Card 1: Slots -->
+    <!-- slots -->
     <article class="game-card">
       <div class="card-image-wrap">
         <span class="badge popular">Popular</span>
-        <img src="" alt="Golden Reels slot machine" data-placeholder-label="Golden Reels" class="game-image">
+        <img src="Slots.jpg" alt="Golden Reels slot machine" data-placeholder-label="Golden Reels" class="game-image">
       </div>
       <div class="card-body">
         <h3>Golden Reels</h3>
@@ -492,11 +489,11 @@
       </div>
     </article>
 
-    <!-- Card 2: Blackjack -->
+    <!-- 21 -->
     <article class="game-card">
       <div class="card-image-wrap">
         <span class="badge new">New</span>
-        <img src="" alt="Twenty-One blackjack table" data-placeholder-label="Twenty-One" class="game-image">
+        <img src="black_jack.jpg" alt="Twenty-One blackjack table" data-placeholder-label="Twenty-One" class="game-image">
       </div>
       <div class="card-body">
         <h3>Twenty-One</h3>
@@ -508,7 +505,7 @@
       </div>
     </article>
 
-    <!-- Card 3: Roulette (placeholder game) -->
+    <!-- Roulette -->
     <article class="game-card">
       <div class="card-image-wrap">
         <span class="badge soon">Coming soon</span>
@@ -524,7 +521,7 @@
       </div>
     </article>
 
-    <!-- Card 4: Poker (placeholder game) -->
+    <!-- Poker -->
     <article class="game-card">
       <div class="card-image-wrap">
         <span class="badge soon">Coming soon</span>
@@ -545,7 +542,7 @@
 
 <footer>Play-money simulation <span id="secret-bullet">•</span> no real gambling, payment, or age verification involved</footer>
 
-<!-- ============ SETTINGS MODAL ============ -->
+<!-- Beállítások -->
 <div class="modal-backdrop" id="settings-backdrop">
   <div class="modal">
     <button class="close-x" data-close="settings-backdrop">✕</button>
@@ -582,7 +579,7 @@
   </div>
 </div>
 
-<!-- ============ LOG IN MODAL ============ -->
+<!-- bejelentkezés -->
 <div class="modal-backdrop" id="login-backdrop">
   <div class="modal">
     <button class="close-x" data-close="login-backdrop">✕</button>
@@ -607,7 +604,7 @@
   </div>
 </div>
 
-<!-- ============ SIGN UP MODAL ============ -->
+<!-- regisztráció html -->
 <div class="modal-backdrop" id="signup-backdrop">
   <div class="modal">
     <button class="close-x" data-close="signup-backdrop">✕</button>
@@ -637,7 +634,7 @@
 </div>
 
 <script>
-/* ============ Balance (shared with casino.html via localStorage) ============ */
+/*  Egyenleg */
 const STORAGE_KEY = 'velvet-table-balance';
 let balance = Number(localStorage.getItem(STORAGE_KEY));
 if (!Number.isFinite(balance) || balance <= 0) balance = 1000;
@@ -649,15 +646,7 @@ function renderBalance(){
 }
 renderBalance();
 
-/* ============ Placeholder game images ============
-   Each <img class="game-image"> starts with an empty src. If it's empty,
-   we generate a simple labeled placeholder graphic on the fly so the
-   layout looks right before real art is added. To use your own image,
-   just set the src attribute in the HTML, e.g.:
-     <img src="images/golden-reels.jpg" ...>
-   and delete the data-placeholder-label attribute (or leave it — it's
-   only read when src is empty).
-*/
+/* Játék kártyák */
 function placeholderDataUri(label){
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="400" height="250">
@@ -675,14 +664,14 @@ document.querySelectorAll('.game-image').forEach(img => {
   }
 });
 
-/* ============ Play buttons ============ */
+/*  Play gombok a kártyán  */
 document.querySelectorAll('.play-btn[data-href]').forEach(btn => {
   btn.addEventListener('click', () => {
     window.location.href = btn.dataset.href;
   });
 });
 
-/* ============ Modal open/close helpers ============ */
+/*  Modal open/close helpers  */
 function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 
@@ -698,7 +687,7 @@ document.addEventListener('keydown', e => {
   }
 });
 
-/* ============ Settings ============ */
+/* Beállítások java */
 document.getElementById('settings-btn').addEventListener('click', () => openModal('settings-backdrop'));
 
 document.getElementById('reset-balance-btn').addEventListener('click', () => {
@@ -709,8 +698,6 @@ document.getElementById('reset-balance-btn').addEventListener('click', () => {
   setTimeout(() => { msg.textContent = ''; }, 2500);
 });
 
-/* Sound / reduced-motion toggles are stored so casino.html could read
-   them too, but no audio is wired up yet in this prototype. */
 const soundToggle = document.getElementById('sound-toggle');
 const motionToggle = document.getElementById('motion-toggle');
 soundToggle.checked = localStorage.getItem('vt-sound') !== 'off';
@@ -722,7 +709,7 @@ motionToggle.addEventListener('change', () => {
   localStorage.setItem('vt-reduced-motion', motionToggle.checked ? 'on' : 'off');
 });
 
-/* ============ Log in / Sign up ============ */
+/* regisztráció / bejelentkezés java*/
 document.getElementById('login-open-btn').addEventListener('click', () => openModal('login-backdrop'));
 document.getElementById('signup-open-btn').addEventListener('click', () => openModal('signup-backdrop'));
 
