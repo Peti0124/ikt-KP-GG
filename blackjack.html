@@ -1,301 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hu">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Twenty-One — The Velvet Table</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --green-dark:#0a2a20;
-    --green:#0e3b2c;
-    --green-light:#154a37;
-    --gold:#c9a227;
-    --gold-bright:#e8c85a;
-    --yellow:#f2c94c;
-    --white:#f5f3ec;
-    --white-pure:#ffffff;
-    --black:#0d0d0d;
-    --red:#a63d40;
-    --red-bright:#d3595c;
-    --grey:#8b948e;
-    --grey-dark:#3a423d;
-  }
-
-  *{ box-sizing:border-box; }
-
-  body{
-    margin:0;
-    background:
-      radial-gradient(circle at 50% 0%, var(--green-light) 0%, var(--green) 45%, var(--green-dark) 100%);
-    color:var(--white);
-    font-family:'Inter', sans-serif;
-    min-height:100vh;
-  }
-
-  h1, h2, .display{ font-family:'Fraunces', serif; }
-  a{ color:inherit; text-decoration:none; }
-
-  /* ---------- Top bar ---------- */
-  .topbar{
-    position:sticky;
-    top:0;
-    z-index:50;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:16px;
-    padding:14px 28px;
-    background:rgba(13,13,13,0.85);
-    backdrop-filter:blur(6px);
-    border-bottom:1px solid rgba(201,162,39,0.3);
-  }
-
-  .brand{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    font-family:'Fraunces', serif;
-    font-size:20px;
-    font-weight:600;
-    color:var(--white-pure);
-  }
-  .brand .mark{
-    width:30px; height:30px;
-    border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, var(--gold-bright), var(--gold) 60%, #7a5f14 100%);
-    display:flex; align-items:center; justify-content:center;
-    font-size:15px;
-    color:var(--black);
-  }
-
-  .back-link{
-    font-size:13px;
-    color:var(--grey);
-    border:1px solid var(--grey-dark);
-    padding:7px 14px;
-    border-radius:999px;
-    transition:border-color .15s ease, color .15s ease;
-  }
-  .back-link:hover{ border-color:var(--gold); color:var(--white-pure); }
-
-  .balance-chip{
-    background:rgba(255,255,255,0.06);
-    border:1px solid var(--grey-dark);
-    border-radius:999px;
-    padding:7px 16px;
-    font-size:13.5px;
-    color:var(--yellow);
-    font-weight:600;
-  }
-  .balance-chip span.label{ color:var(--grey); font-weight:500; margin-right:6px; }
-
-  .topbar-right{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    flex-wrap:wrap;
-  }
-
-  /* ---------- Game area ---------- */
-  main{
-    max-width:600px;
-    margin:0 auto;
-    padding:48px 24px 70px;
-  }
-
-  .table-card{
-    background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.15));
-    border:1px solid rgba(201,162,39,0.3);
-    border-radius:10px;
-    padding:30px;
-  }
-
-  .table-card h2{
-    margin:0 0 4px;
-    font-size:28px;
-    color:var(--gold-bright);
-  }
-  .table-card .sub{
-    margin:0 0 26px;
-    font-size:13.5px;
-    color:var(--grey);
-    line-height:1.5;
-  }
-
-  .bj-zone{ margin-bottom:20px; }
-  .zone-label{
-    font-size:12.5px;
-    color:var(--grey);
-    display:flex;
-    justify-content:space-between;
-    margin-bottom:8px;
-  }
-  .zone-label .total{ color:var(--white); font-weight:600; }
-
-  .card-row{
-    display:flex;
-    gap:8px;
-    min-height:82px;
-    flex-wrap:wrap;
-  }
-  .card{
-    width:56px;
-    height:78px;
-    background:var(--white-pure);
-    color:var(--black);
-    border-radius:6px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-family:'Fraunces', serif;
-    font-weight:600;
-    font-size:21px;
-    box-shadow:0 3px 6px rgba(0,0,0,0.35);
-  }
-  .card.red{ color:var(--red); }
-  .card.back{
-    background:repeating-linear-gradient(45deg, var(--green-light), var(--green-light) 4px, var(--gold) 4px, var(--gold) 8px);
-  }
-
-  /* Player hands (one normally, two after a split) */
-  .hand-block{
-    padding:10px 12px;
-    border:1px solid transparent;
-    border-radius:8px;
-    margin-bottom:8px;
-  }
-  .hand-block.active{
-    border-color:var(--gold);
-    background:rgba(201,162,39,0.08);
-  }
-
-  .result-msg{
-    min-height:26px;
-    text-align:center;
-    font-size:15px;
-    font-weight:600;
-    margin-bottom:10px;
-  }
-  .result-msg.win{ color:#8fd19e; }
-  .result-msg.lose{ color:var(--red-bright); }
-  .result-msg.neutral{ color:var(--grey); }
-
-  .bet-row{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:10px;
-    margin-bottom:22px;
-    flex-wrap:wrap;
-  }
-  .bet-row label{
-    font-size:13px;
-    color:var(--grey);
-    margin-right:2px;
-  }
-  .bet-row input[type=number]{
-    width:90px;
-    background:rgba(0,0,0,0.3);
-    border:1px solid rgba(201,162,39,0.4);
-    color:var(--white);
-    padding:8px 10px;
-    border-radius:6px;
-    font-family:'Inter', sans-serif;
-    font-size:15px;
-  }
-  .chip-btn{
-    background:rgba(201,162,39,0.15);
-    border:1px solid var(--gold);
-    color:var(--gold-bright);
-    padding:6px 12px;
-    border-radius:999px;
-    font-size:12.5px;
-    cursor:pointer;
-    transition:background .15s ease;
-  }
-  .chip-btn:hover:not(:disabled){ background:rgba(201,162,39,0.3); }
-  .chip-btn:disabled{ opacity:0.4; cursor:not-allowed; }
-
-  .bj-actions{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-  }
-
-  .primary-btn{
-    flex:1;
-    background:var(--gold);
-    color:var(--black);
-    border:none;
-    padding:13px 22px;
-    border-radius:6px;
-    font-family:'Inter', sans-serif;
-    font-weight:600;
-    font-size:15px;
-    cursor:pointer;
-    transition:background .15s ease, transform .1s ease;
-  }
-  .primary-btn:hover:not(:disabled){ background:var(--gold-bright); }
-  .primary-btn:disabled{ opacity:0.4; cursor:not-allowed; }
-  .primary-btn:active:not(:disabled){ transform:scale(0.98); }
-
-  .secondary-btn{
-    flex:1;
-    background:transparent;
-    border:1px solid var(--grey);
-    color:var(--white);
-    padding:13px 18px;
-    border-radius:6px;
-    font-size:14.5px;
-    cursor:pointer;
-  }
-  .secondary-btn:hover:not(:disabled){ color:var(--white-pure); border-color:var(--white-pure); }
-  .secondary-btn:disabled{ opacity:0.35; cursor:not-allowed; }
-
-  .split-btn{
-    flex:1;
-    background:transparent;
-    border:1px solid var(--yellow);
-    color:var(--yellow);
-    padding:13px 18px;
-    border-radius:6px;
-    font-size:14.5px;
-    font-weight:600;
-    cursor:pointer;
-  }
-  .split-btn:hover:not(:disabled){ background:rgba(242,201,76,0.15); }
-  .split-btn:disabled{ opacity:0.3; cursor:not-allowed; border-color:var(--grey-dark); color:var(--grey); }
-
-  footer{
-    text-align:center;
-    padding:20px;
-    font-size:12px;
-    color:rgba(245,243,236,0.4);
-  }
-
-  /* ---------- Hidden bonus pack toast ---------- */
-  .bonus-toast{
-    position:fixed;
-    left:50%;
-    bottom:28px;
-    transform:translate(-50%, 30px);
-    opacity:0;
-    pointer-events:none;
-    background:var(--black);
-    border:1px solid var(--gold);
-    color:var(--gold-bright);
-    padding:12px 22px;
-    border-radius:999px;
-    font-size:14px;
-    font-weight:600;
-    text-align:center;
-    z-index:200;
-    transition:opacity .25s ease, transform .25s ease;
-  }
-  .bonus-toast.show{ opacity:1; transform:translate(-50%, 0); }
-</style>
+<link rel="stylesheet" href="black_jack.css">
 </head>
 <body>
 
@@ -348,7 +59,7 @@
 <footer>Play-money simulation • no real gambling, payment, or age verification involved</footer>
 
 <script>
-/* ============ Shared balance (same key as home.html / slots.html) ============ */
+/* Egyenleg */
 const STORAGE_KEY = 'velvet-table-balance';
 let balance = Number(localStorage.getItem(STORAGE_KEY));
 if (!Number.isFinite(balance) || balance <= 0) balance = 1000;
@@ -383,7 +94,7 @@ function takeBet(inputEl, msgEl){
   return bet;
 }
 
-/* ============ Blackjack ============ */
+/* 21 */
 const RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 const SUITS = [{s:'♠',red:false},{s:'♣',red:false},{s:'♥',red:true},{s:'♦',red:true}];
 
@@ -439,7 +150,7 @@ function isNaturalBlackjack(cards){
   return cards.length === 2 && handTotal(cards) === 21;
 }
 
-/* ---------- Rendering ---------- */
+/* Dealer kártya */
 function renderCard(card){
   const div = document.createElement('div');
   div.className = 'card' + (card.red ? ' red' : '');
@@ -448,7 +159,6 @@ function renderCard(card){
 }
 
 function renderTable(hideDealerHole){
-  // Dealer: first card always face up, second card hidden until the round is over
   dealerCardsEl.innerHTML = '';
   dealerHand.forEach((card, i) => {
     if (hideDealerHole && i === 1){
@@ -466,7 +176,6 @@ function renderTable(hideDealerHole){
       ? `Showing ${cardValue(dealerHand[0])}`
       : `Total ${handTotal(dealerHand)}`;
 
-  // Player: one block per hand
   playerHandsEl.innerHTML = '';
   hands.forEach((hand, i) => {
     const block = document.createElement('div');
@@ -524,7 +233,7 @@ function endRound(){
   updateButtons();
 }
 
-/* ---------- Deal ---------- */
+/*  osztás  */
 dealBtn.addEventListener('click', () => {
   const bet = takeBet(bjBetInput, bjMsg);
   if (bet === null) return;
@@ -543,10 +252,10 @@ dealBtn.addEventListener('click', () => {
   const playerBJ = isNaturalBlackjack(hands[0].cards);
   const dealerBJ = isNaturalBlackjack(dealerHand);
 
-  // Dealer checks for blackjack right away. If either side has one, the round is over immediately.
+  // osztónak 21-je van-e
   if (dealerBJ || playerBJ){
     roundActive = false;
-    renderTable(false);   // reveal the hole card
+    renderTable(false);   
 
     if (dealerBJ && playerBJ){
       balance += bet;
@@ -568,7 +277,7 @@ dealBtn.addEventListener('click', () => {
   updateButtons();
 });
 
-/* ---------- Player actions ---------- */
+/*  döntések   */
 hitBtn.addEventListener('click', () => {
   if (!roundActive) return;
   hands[activeIdx].cards.push(deck.pop());
@@ -585,7 +294,7 @@ splitBtn.addEventListener('click', () => {
   if (!canSplit()) return;
   const h = hands[0];
 
-  balance -= h.bet;   // second hand needs its own matching bet
+  balance -= h.bet;   // split esetén 2. pakli
   renderBalance();
   hasSplit = true;
 
@@ -598,8 +307,7 @@ splitBtn.addEventListener('click', () => {
   afterAction();
 });
 
-// Moves on from any hand that is finished (bust or 21), then either
-// continues with the next hand or lets the dealer play.
+// folytatás
 function afterAction(){
   while (activeIdx < hands.length){
     const h = hands[activeIdx];
@@ -624,7 +332,7 @@ function afterAction(){
   updateButtons();
 }
 
-/* ---------- Dealer plays, then settle every hand ---------- */
+/*  Játék vége  */
 function finishRound(){
   roundActive = false;
 
@@ -679,15 +387,10 @@ function finishRound(){
   endRound();
 }
 
-// initial empty state
+//
 dealerTotalEl.textContent = '';
 
-/* ============ Hidden bonus pack ============
-   One per page, each worth a different amount. Found state is saved in
-   localStorage so every pack can only be claimed once. To reset them
-   for testing, run this in the browser console:
-     localStorage.removeItem('velvet-bonus-found')
-*/
+/* Ajándék */
 const BONUS_KEY = 'velvet-bonus-found';
 const BONUS_PAGE = 'blackjack';
 const BONUS_AMOUNT = 300;

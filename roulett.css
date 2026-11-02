@@ -1,0 +1,366 @@
+:root {
+  --green: #0f5a38;
+  --felt: #0a3d27;
+  --gold: #d4af37;
+  --red: #b3202a;
+  --black: #101010;
+  --grey: #8a8a8a;
+  --white: #f4f4f0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(ellipse at top, #0b3d28 0, #04180f 70%) fixed;
+  color: var(--white);
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
+}
+.serif {
+  font-family: "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 22px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.35);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 0.02em;
+}
+
+header a {
+  color: var(--white);
+  text-decoration: none;
+  border: 1px solid var(--grey);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+header a:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+main {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 18px 16px 60px;
+}
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+  align-items: baseline;
+  margin-bottom: 12px;
+}
+.stat {
+  font-size: 0.95rem;
+  color: #cfd8d2;
+}
+.stat b {
+  font-family: "Palatino Linotype", Palatino, Georgia, serif;
+  font-size: 1.5rem;
+  color: var(--gold);
+  margin-left: 6px;
+}
+#msg {
+  min-height: 1.5em;
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+}
+#msg.win {
+  color: #7be3a0;
+}
+#msg.lose {
+  color: #e8b0b0;
+}
+.tablewrap {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+.scroll {
+  flex: 1 1 640px;
+  overflow-x: auto;
+  padding: 12px;
+  background: var(--felt);
+  border: 3px solid var(--gold);
+  border-radius: 14px;
+}
+#table {
+  display: grid;
+  grid-template-columns: 1.1fr repeat(12, 1fr) 1.1fr;
+  grid-template-rows: repeat(3, 52px) 40px 40px;
+  gap: 3px;
+  min-width: 640px;
+}
+.cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(212, 175, 55, 0.7);
+  background: var(--green);
+  color: var(--white);
+  font:
+    600 1rem "Palatino Linotype",
+    Palatino,
+    Georgia,
+    serif;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 3px;
+  padding: 0;
+}
+.cell:hover {
+  filter: brightness(1.35);
+}
+.cell.red {
+  background: var(--red);
+}
+.cell.black {
+  background: var(--black);
+}
+.cell.zero {
+  background: #137a45;
+}
+.cell.out {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.cell:disabled {
+  cursor: not-allowed;
+  filter: none;
+}
+.stake {
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 5px;
+  border-radius: 13px;
+  background: var(--gold);
+  color: #111;
+  font:
+    700 0.72rem system-ui,
+    sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px #000a;
+  pointer-events: none;
+}
+.side {
+  flex: 0 0 190px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+}
+
+button.act {
+  font:
+    600 0.95rem system-ui,
+    sans-serif;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--gold);
+  background: transparent;
+  color: var(--gold);
+  cursor: pointer;
+}
+button.act:hover:not(:disabled) {
+  background: var(--gold);
+  color: #111;
+}
+button.act:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+button.act.primary {
+  background: var(--gold);
+  color: #111;
+}
+button.act.primary:hover:not(:disabled) {
+  background: #f0cb55;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 18px 0 6px;
+}
+
+.chips {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.chip {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: 4px dashed rgba(255, 255, 255, 0.85);
+  outline: 3px solid transparent;
+  font: 700 0.95rem system-ui, sans-serif;
+  cursor: pointer;
+  box-shadow: 0 3px 6px #0009;
+  transition: transform 0.12s;
+}
+.chip:hover {
+  transform: translateY(-2px);
+}
+.chip.sel {
+  outline-color: var(--gold);
+  transform: translateY(-6px);
+}
+.chip[data-v="10"] {
+  background: #ececec;
+  color: #111;
+  border-color: #555;
+}
+.chip[data-v="20"] {
+  background: var(--red);
+  color: #fff;
+}
+.chip[data-v="50"] {
+  background: #2e8b57;
+  color: #fff;
+}
+.chip[data-v="100"] {
+  background: #111;
+  color: var(--gold);
+  border-color: var(--gold);
+}
+.chip[data-v="1000"] {
+  background: var(--gold);
+  color: #111;
+  border-color: #6b5513;
+}
+.chip[data-v="10000"] {
+  background: #6f6f6f;
+  color: #fff;
+}
+.chip:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#spin {
+  min-width: 160px;
+  font-size: 1.15rem;
+  padding: 14px 26px;
+}
+.wheelwrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 26px;
+  gap: 12px;
+}
+canvas {
+  width: min(100%, 520px);
+  height: auto;
+  aspect-ratio: 1;
+}
+
+#result {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 3px solid var(--gold);
+  font:
+    700 1.6rem "Palatino Linotype",
+    Palatino,
+    Georgia,
+    serif;
+}
+
+#history {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  min-height: 30px;
+}
+#history span {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font:
+    600 0.8rem system-ui,
+    sans-serif;
+  border: 1px solid rgba(212, 175, 55, 0.7);
+}
+
+.r {
+  background: var(--red);
+}
+.b {
+  background: var(--black);
+}
+.g {
+  background: #137a45;
+}
+
+#bonus {
+  position: fixed;
+  left: 8px;
+  bottom: 8px;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--gold);
+  font-size: 15px;
+  cursor: pointer;
+  opacity: 0.1;
+  transition: opacity 0.3s;
+}
+#bonus:hover,
+#bonus:focus-visible {
+  opacity: 0.9;
+}
+
+#refill {
+  display: none;
+  margin-top: 8px;
+}
+@media (max-width: 700px) {
+  .side {
+    flex: 1 1 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .side .act {
+    flex: 1;
+  }
+}
