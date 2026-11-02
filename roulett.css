@@ -23,40 +23,71 @@ body {
     "Segoe UI",
     sans-serif;
 }
-.serif {
-  font-family: "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
-}
 
-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 14px 22px;
-  border-bottom: 1px solid rgba(212, 175, 55, 0.35);
-}
+.topbar{
+    position:sticky;
+    top:0;
+    z-index:50;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:14px 28px;
+    background:rgba(13,13,13,0.85);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid rgba(201,162,39,0.3);
+  }
 
-header h1 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--gold);
-  letter-spacing: 0.02em;
-}
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:'Fraunces', serif;
+    font-size:20px;
+    font-weight:600;
+    color:var(--white-pure);
+  }
 
-header a {
-  color: var(--white);
-  text-decoration: none;
-  border: 1px solid var(--grey);
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 0.9rem;
-}
+  .brand .mark{
+    width:30px; height:30px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--gold-bright), var(--gold) 60%, #7a5f14 100%);
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px;
+    color:var(--black);
+  }
 
-header a:hover {
-  border-color: var(--gold);
-  color: var(--gold);
-}
+  /* vissza gomb */
+  .back-link{
+    font-size:13px;
+    color:var(--grey);
+    border:1px solid var(--grey-dark);
+    padding:7px 14px;
+    border-radius:999px;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .back-link:hover{
+     border-color:var(--gold);
+     color:var(--white-pure); 
+    }
+
+  .balance-chip{
+    background:rgba(255,255,255,0.06);
+    border:1px solid var(--grey-dark);
+    border-radius:999px;
+    padding:7px 16px;
+    font-size:13.5px;
+    color:var(--yellow);
+    font-weight:600;
+  }
+  .balance-chip span.label{ color:var(--grey); font-weight:500; margin-right:6px; }
+
+  .topbar-right{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
 main {
   max-width: 1060px;
   margin: 0 auto;
