@@ -100,7 +100,7 @@ const SUITS = [{s:'♠',red:false},{s:'♣',red:false},{s:'♥',red:true},{s:'�
 
 let deck = [];
 let dealerHand = [];
-// Each player hand: { cards: [...], bet: number, status: 'playing' | 'stand' | 'bust' }
+// Minden kéz kap egy külön játékot
 let hands = [];
 let activeIdx = 0;
 let hasSplit = false;
@@ -242,7 +242,7 @@ dealBtn.addEventListener('click', () => {
   renderBalance();
 
   deck = freshDeck();
-  dealerHand = [deck.pop(), deck.pop()];   // [0] = face-up card, [1] = hidden hole card
+  dealerHand = [deck.pop(), deck.pop()];   // [0] = felfordítja, [1] = elrejti a kártyát
   hands = [{ cards: [deck.pop(), deck.pop()], bet, status: 'playing' }];
   activeIdx = 0;
   hasSplit = false;
@@ -277,7 +277,7 @@ dealBtn.addEventListener('click', () => {
   updateButtons();
 });
 
-/*  döntések   */
+/*  döntések  */
 hitBtn.addEventListener('click', () => {
   if (!roundActive) return;
   hands[activeIdx].cards.push(deck.pop());
@@ -294,7 +294,7 @@ splitBtn.addEventListener('click', () => {
   if (!canSplit()) return;
   const h = hands[0];
 
-  balance -= h.bet;   // split esetén 2. pakli
+  balance -= h.bet;   // split esetén 2. kéz
   renderBalance();
   hasSplit = true;
 
@@ -417,7 +417,7 @@ function showBonusToast(text){
 
 function claimBonus(){
   const found = readBonusFound();
-  if (found[BONUS_PAGE]) return;   // already claimed on this page
+  if (found[BONUS_PAGE]) return;   // Már aktivált aji
   found[BONUS_PAGE] = true;
   localStorage.setItem(BONUS_KEY, JSON.stringify(found));
 

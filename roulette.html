@@ -4,6 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Roulette</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="roulett.css" />
   </head>
   <body>
@@ -124,7 +129,7 @@
           msg.className = cls || "";
         }
 
-        /* ---------- table ---------- */
+        /*  Tétrakó asztal  */
         var tableEl = $("table"),
           cells = {};
         function addCell(key, label, cls, r, c, rs, cs) {
@@ -190,6 +195,7 @@
         }
         function refresh() {
           $("balance").textContent = fmt(balance);
+          $("balance-display").textContent = fmt(balance);
           $("total").textContent = fmt(totalBet());
           for (var k in cells) {
             var old = cells[k].querySelector(".stake");
